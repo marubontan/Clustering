@@ -13,8 +13,8 @@ function main()
 
     data = makeData()
 
-    knn = kMeans(DataFrame(data), 2)
-    predictedClass = fit(knn)
+    kmeans = kMeans(DataFrame(data), 2)
+    predictedClass = fit(kmeans)
     print(predictedClass)
 end
 
