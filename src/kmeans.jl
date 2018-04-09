@@ -6,14 +6,15 @@ type kMeansResults
     x::DataFrames.DataFrame
     k::Int
     estimatedClass::Array{Int}
-
+    iterCount::Int
 end
 
 function kMeans(data, k)
     dataPointsNum = size(data, 1)
     estimatedClass = Array{Int}(dataPointsNum)
-    sample!(1:kMeans.k, estimatedClass)
+    sample!(1:k, estimatedClass)
 
+    iterCount = 0
     while true
         # update representative points
         representativePoints = []
@@ -40,11 +41,13 @@ function kMeans(data, k)
         end
 
         if estimatedClass == tempEstimatedClass
+            iterCount += 1
             break
         end
         estimatedClass = tempEstimatedClass
+        iterCount += 1
     end
-    return kMeansResults(data, k, estimatedClass) 
+    return kMeansResults(data, k, estimatedClass, iterCount)
 end
 
 function calcDist(sourcePoint::Array, destPoint::Array; method="euclidean")
