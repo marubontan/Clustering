@@ -7,6 +7,7 @@ type kMeansResults
     k::Int
     estimatedClass::Array{Int}
     iterCount::Int
+    costArray::Array{Float64}
 end
 
 function kMeans(data, k)
@@ -15,6 +16,7 @@ function kMeans(data, k)
     sample!(1:k, estimatedClass)
 
     iterCount = 0
+    costArray = Float64[]
     while true
         # update representative points
         representativePoints = []
@@ -29,6 +31,8 @@ function kMeans(data, k)
 
         # update group belonging
         tempEstimatedClass = Array{Int}(dataPointsNum)
+
+        cost = 0.0
         for dataIndex in 1:dataPointsNum
             dataPoint = Array(data[dataIndex, :])
             distances = Array{Float64}(k)
@@ -37,8 +41,13 @@ function kMeans(data, k)
             end
 
             # TODO: check the existence of argmin
-            tempEstimatedClass[dataIndex] = sortperm(distances)[1]
+            # TODO: this cost calculation is bad hack
+            classIndex = sortperm(distances)[1]
+            tempEstimatedClass[dataIndex] = classIndex
+            cost += distances[classIndex] ^ 2
         end
+
+        push!(costArray, cost)
 
         if estimatedClass == tempEstimatedClass
             iterCount += 1
@@ -47,7 +56,7 @@ function kMeans(data, k)
         estimatedClass = tempEstimatedClass
         iterCount += 1
     end
-    return kMeansResults(data, k, estimatedClass, iterCount)
+    return kMeansResults(data, k, estimatedClass, iterCount, costArray)
 end
 
 function calcDist(sourcePoint::Array, destPoint::Array; method="euclidean")
