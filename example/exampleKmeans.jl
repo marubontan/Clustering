@@ -10,12 +10,10 @@ function makeData()
 end
 
 function main()
-
     data = makeData()
 
-    kmeans = kMeans(DataFrame(data), 2)
-    predictedClass = fit(kmeans)
-    print(predictedClass)
+    kmeansResult = kMeans(DataFrame(data), 2)
+    print(kmeansResult)
 end
 
 main()
