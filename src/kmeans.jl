@@ -11,6 +11,8 @@ type kMeansResults
 end
 
 function kMeans(data, k)
+
+    # initialize
     dataPointsNum = size(data, 1)
     estimatedClass = Array{Int}(dataPointsNum)
     sample!(1:k, estimatedClass)
@@ -19,14 +21,13 @@ function kMeans(data, k)
     costArray = Float64[]
     while true
         # update representative points
-        representativePoints = []
+        representativePoints = Array{Array{Float64,1}}(k)
         for representativeIndex in 1:k
             groupIndex = find(estimatedClass .== representativeIndex)
             groupData = data[groupIndex, :]
 
-            # TODO: check the return type of colwise
             representativePoint = [ valArray[1] for valArray in colwise(mean, groupData) ]
-            push!(representativePoints, representativePoint)
+            representativePoints[representativeIndex] = representativePoint
         end
 
         # update group belonging
@@ -60,11 +61,6 @@ function kMeans(data, k)
 end
 
 function calcDist(sourcePoint::Array, destPoint::Array; method="euclidean")
-
-    if length(sourcePoint) != length(destPoint)
-        error("The lengths of two arrays are different.")
-        return
-    end
 
     if method == "euclidean"
         return euclidean(sourcePoint, destPoint)
