@@ -1,6 +1,8 @@
 using Base.Test
+using Distributions
 using DataFrames
 include("../src/dist.jl")
+include("../src/kmeans.jl")
 
 @testset "distance function" begin
     dataSourceNum = [1.0, 2.0]
