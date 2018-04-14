@@ -47,10 +47,11 @@ function kMeans(data::DataFrame, k::Int)
 
         push!(costArray, cost)
 
-        if estimatedClass == tempEstimatedClass
+        if judgeConvergence(estimatedClass, tempEstimatedClass)
             iterCount += 1
             break
         end
+
         estimatedClass = tempEstimatedClass
         iterCount += 1
     end
@@ -87,6 +88,10 @@ function updateGroupBelonging(data::DataFrame, dataPointsNum::Int, representativ
         cost += distances[classIndex] ^ 2
     end
     return tempEstimatedClass, cost
+end
+
+function judgeConvergence(estimatedClass, tempEstimatedClass)
+    return estimatedClass == tempEstimatedClass
 end
 
 """
