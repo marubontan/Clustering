@@ -1,4 +1,4 @@
-function euclidean(sourcePoint, destPoint)
+function euclidean(sourcePoint::Array, destPoint::Array)
     length(sourcePoint) == length(destPoint) || error("The lengths of source and destination points should be same.")
 
     sum = 0
@@ -9,7 +9,7 @@ function euclidean(sourcePoint, destPoint)
     return dist
 end
 
-function minkowski(sourcePoint, destPoint)
+function minkowski(sourcePoint::Array, destPoint::Array)
     length(sourcePoint) == length(destPoint) || error("The lengths of source and destination points should be same.")
 
     sum = 0

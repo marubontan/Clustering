@@ -10,7 +10,7 @@ type kMeansResults
     costArray::Array{Float64}
 end
 
-function kMeans(data, k)
+function kMeans(data::DataFrame, k::Int)
 
     # initialize
     dataPointsNum = size(data, 1)
@@ -37,7 +37,7 @@ function kMeans(data, k)
     return kMeansResults(data, k, estimatedClass, iterCount, costArray)
 end
 
-function updateRepresentative(data, estimatedClass, k)
+function updateRepresentative(data::DataFrame, estimatedClass::Array{Int}, k::Int)
     representativePoints = Array{Array{Float64,1}}(k)
     for representativeIndex in 1:k
         groupIndex = find(estimatedClass .== representativeIndex)
@@ -49,7 +49,7 @@ function updateRepresentative(data, estimatedClass, k)
     return representativePoints
 end
 
-function updateGroupBelonging(data, dataPointsNum, representativePoints, k)
+function updateGroupBelonging(data::DataFrame, dataPointsNum::Int, representativePoints::Array{Array{Float64, 1}}, k::Int)
     tempEstimatedClass = Array{Int}(dataPointsNum)
 
     cost = 0.0
