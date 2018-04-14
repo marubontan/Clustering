@@ -34,8 +34,7 @@ function kMeans(data::DataFrame, k::Int)
 
     # initialize
     dataPointsNum = size(data, 1)
-    estimatedClass = Array{Int}(dataPointsNum)
-    sample!(1:k, estimatedClass)
+    estimatedClass = initializeClass(dataPointsNum, k)
 
     iterCount = 0
     costArray = Float64[]
@@ -56,6 +55,12 @@ function kMeans(data::DataFrame, k::Int)
         iterCount += 1
     end
     return kMeansResults(data, k, estimatedClass, iterCount, costArray)
+end
+
+function initializeClass(dataPointsNum, k)
+    estimatedClass = Array{Int}(dataPointsNum)
+    sample!(1:k, estimatedClass)
+    return estimatedClass
 end
 
 function updateRepresentative(data::DataFrame, estimatedClass::Array{Int}, k::Int)
