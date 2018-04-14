@@ -10,6 +10,26 @@ type kMeansResults
     costArray::Array{Float64}
 end
 
+"""
+    kMeans(data, k)
+
+Do clustering to data with K-means algorithm.
+
+# Arguments
+- `data::DataFrame`: the clustering target data.
+- `k::Int`: the number of clusters.
+
+# Examples
+```julia-kMeans
+julia> kMeans(DataFrame(x = [1,2,3], y = [4,5,6]),2)
+kMeansResults(3×2 DataFrames.DataFrame
+│ Row │ x │ y │
+├─────┼───┼───┤
+│ 1   │ 1 │ 4 │
+│ 2   │ 2 │ 5 │
+│ 3   │ 3 │ 6 │, 2, [1, 1, 1], 1, [4.0])
+```
+"""
 function kMeans(data::DataFrame, k::Int)
 
     # initialize
@@ -69,6 +89,22 @@ function updateGroupBelonging(data::DataFrame, dataPointsNum::Int, representativ
     return tempEstimatedClass, cost
 end
 
+"""
+    calcDist(sourcePoint, destPoint; method="euclidean")
+
+Calculate the distance between sourcePoint and destPoint by the method.
+
+# Argument
+- `sourcePoint::Array`: Array to show the one point.
+- `destPoint::Array`: Array to show the one point.
+- `method::String`: distance function for calculation. euclidean,minkowski.
+
+# Examples
+```julia-calcDist
+julia> calcDist([1,2,3], [2,3,4]; method="minkowski")
+3
+```
+"""
 function calcDist(sourcePoint::Array, destPoint::Array; method="euclidean")
 
     if method == "euclidean"
