@@ -11,6 +11,8 @@ type kMeansResults
 end
 
 function kMeans(data, k)
+
+    # initialize
     dataPointsNum = size(data, 1)
     estimatedClass = Array{Int}(dataPointsNum)
     sample!(1:k, estimatedClass)
@@ -18,34 +20,10 @@ function kMeans(data, k)
     iterCount = 0
     costArray = Float64[]
     while true
-        # update representative points
-        representativePoints = []
-        for representativeIndex in 1:k
-            groupIndex = find(estimatedClass .== representativeIndex)
-            groupData = data[groupIndex, :]
 
-            # TODO: check the return type of colwise
-            representativePoint = [ valArray[1] for valArray in colwise(mean, groupData) ]
-            push!(representativePoints, representativePoint)
-        end
-
-        # update group belonging
-        tempEstimatedClass = Array{Int}(dataPointsNum)
-
-        cost = 0.0
-        for dataIndex in 1:dataPointsNum
-            dataPoint = Array(data[dataIndex, :])
-            distances = Array{Float64}(k)
-            for representativeIndex in 1:k
-                distances[representativeIndex] = calcDist(dataPoint, representativePoints[representativeIndex])
-            end
-
-            # TODO: check the existence of argmin
-            # TODO: this cost calculation is bad hack
-            classIndex = sortperm(distances)[1]
-            tempEstimatedClass[dataIndex] = classIndex
-            cost += distances[classIndex] ^ 2
-        end
+        # update
+        representativePoints = updateRepresentative(data, estimatedClass, k)
+        tempEstimatedClass, cost = updateGroupBelonging(data, dataPointsNum, representativePoints, k)
 
         push!(costArray, cost)
 
@@ -59,12 +37,39 @@ function kMeans(data, k)
     return kMeansResults(data, k, estimatedClass, iterCount, costArray)
 end
 
-function calcDist(sourcePoint::Array, destPoint::Array; method="euclidean")
+function updateRepresentative(data, estimatedClass, k)
+    representativePoints = Array{Array{Float64,1}}(k)
+    for representativeIndex in 1:k
+        groupIndex = find(estimatedClass .== representativeIndex)
+        groupData = data[groupIndex, :]
 
-    if length(sourcePoint) != length(destPoint)
-        error("The lengths of two arrays are different.")
-        return
+        representativePoint = [ valArray[1] for valArray in colwise(mean, groupData) ]
+        representativePoints[representativeIndex] = representativePoint
     end
+    return representativePoints
+end
+
+function updateGroupBelonging(data, dataPointsNum, representativePoints, k)
+    tempEstimatedClass = Array{Int}(dataPointsNum)
+
+    cost = 0.0
+    for dataIndex in 1:dataPointsNum
+        dataPoint = Array(data[dataIndex, :])
+        distances = Array{Float64}(k)
+        for representativeIndex in 1:k
+            distances[representativeIndex] = calcDist(dataPoint, representativePoints[representativeIndex])
+        end
+
+        # TODO: check the existence of argmin
+        # TODO: this cost calculation is bad hack
+        classIndex = sortperm(distances)[1]
+        tempEstimatedClass[dataIndex] = classIndex
+        cost += distances[classIndex] ^ 2
+    end
+    return tempEstimatedClass, cost
+end
+
+function calcDist(sourcePoint::Array, destPoint::Array; method="euclidean")
 
     if method == "euclidean"
         return euclidean(sourcePoint, destPoint)
