@@ -34,7 +34,7 @@ function kMeans(data::DataFrame, k::Int)
 
     # initialize
     dataPointsNum = size(data, 1)
-    estimatedClass = initializeClass(dataPointsNum, k)
+    estimatedClass = assignRandomKClass(dataPointsNum, k)
 
     iterCount = 0
     costArray = Float64[]
@@ -57,7 +57,7 @@ function kMeans(data::DataFrame, k::Int)
     return kMeansResults(data, k, estimatedClass, iterCount, costArray)
 end
 
-function initializeClass(dataPointsNum, k)
+function assignRandomKClass(dataPointsNum, k)
     estimatedClass = Array{Int}(dataPointsNum)
     sample!(1:k, estimatedClass)
     return estimatedClass
