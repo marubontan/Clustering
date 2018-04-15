@@ -37,3 +37,22 @@ end
     @test results.k == k
     @test length(results.estimatedClass) ==  size(data)[1]
 end
+
+@testtest "K-medoids test" begin
+    function makeData()
+        groupOne = rand(MvNormal([10.0, 10.0], 5.0 * eye(2)), 100)
+        groupTwo = rand(MvNormal([0.0, 0.0], 10 * eye(2)), 100)
+        return hcat(groupOne, groupTwo)'
+    end
+
+    data = makeData()'
+    k = 2
+    distanceMatrix = pairwise(SqEuclidean(), data)
+
+    resulsts = kMedoids(distanceMatrix, k)
+
+    @test isa(results, kMedoidsResults)
+    @test size(results.x) == size(distanceMatrix)
+    @test results.k == k
+    @test length(results.estimatedClass) ==  size(data)[1]
+end
