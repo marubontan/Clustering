@@ -1,8 +1,10 @@
 using Base.Test
 using Distributions
 using DataFrames
+import Distances
 include("../src/dist.jl")
 include("../src/kmeans.jl")
+include("../src/kmedoids.jl")
 
 @testset "distance function" begin
     dataSourceNum = [1.0, 2.0]
@@ -47,12 +49,12 @@ end
 
     data = makeData()'
     k = 2
-    distanceMatrix = pairwise(SqEuclidean(), data)
+    distanceMatrix = Distances.pairwise(Distances.SqEuclidean(), data)
 
-    resulsts = kMedoids(distanceMatrix, k)
+    results = kMedoids(distanceMatrix, k)
 
     @test isa(results, kMedoidsResults)
     @test size(results.x) == size(distanceMatrix)
     @test results.k == k
-    @test length(results.estimatedClass) ==  size(data)[1]
+    @test length(results.estimatedClass) ==  size(data)[2]
 end

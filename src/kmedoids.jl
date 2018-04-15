@@ -12,6 +12,7 @@ function kMedoids(distanceMatrix, k)
     medoidsIndices = randomlyAssignMedoids(distanceMatrix, k)
 
     iterCount = 0
+    updatedGroupInfo = []
     while true
         # update group belongings
         updatedGroupInfo = updateGroupBelonging(distanceMatrix, medoidsIndices)
