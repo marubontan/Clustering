@@ -1,6 +1,5 @@
 using DataFrames
 using Distributions
-using PyPlot
 include("../src/kmeans.jl")
 
 function makeData()

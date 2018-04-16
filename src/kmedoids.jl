@@ -4,6 +4,7 @@ type kMedoidsResults
     x
     k::Int
     estimatedClass::Array{Int}
+    medoids::Array{Array}
     iterCount::Int
 end
 
@@ -13,12 +14,14 @@ function kMedoids(distanceMatrix, k)
 
     iterCount = 0
     updatedGroupInfo = []
+    medoids = []
     while true
         # update group belongings
         updatedGroupInfo = updateGroupBelonging(distanceMatrix, medoidsIndices)
 
         # update medoids
         updatedMedoids = updateMedoids(distanceMatrix, updatedGroupInfo, k)
+        push!(medoids, updatedMedoids)
 
         if medoidsIndices == updatedMedoids
             iterCount += 1
@@ -27,7 +30,7 @@ function kMedoids(distanceMatrix, k)
         medoidsIndices = updatedMedoids
         iterCount += 1
     end
-    return kMedoidsResults(distanceMatrix, k, updatedGroupInfo, iterCount, )
+    return kMedoidsResults(distanceMatrix, k, updatedGroupInfo, medoids, iterCount, )
 end
 
 function randomlyAssignMedoids(distanceMatrix, k::Int)
