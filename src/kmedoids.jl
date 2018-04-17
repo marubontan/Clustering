@@ -39,10 +39,7 @@ function kMedoids(distanceMatrix, k::Int)
     updatedGroupInfo = []
     medoids = []
     while true
-        # update group belongings
         updatedGroupInfo = updateGroupBelonging(distanceMatrix, medoidsIndices)
-
-        # update medoids
         updatedMedoids = updateMedoids(distanceMatrix, updatedGroupInfo, k)
         push!(medoids, updatedMedoids)
 
