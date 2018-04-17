@@ -46,7 +46,7 @@ function kMedoids(distanceMatrix, k::Int)
         updatedMedoids = updateMedoids(distanceMatrix, updatedGroupInfo, k)
         push!(medoids, updatedMedoids)
 
-        if medoidsIndices == updatedMedoids
+        if judgeConvergence(medoidsIndices, updatedMedoids)
             iterCount += 1
             break
         end
@@ -89,4 +89,8 @@ end
 
 function returnArgumentMin(targetArray::Array)
     return sortperm(targetArray)[1]
+end
+
+function judgeConvergence(medoidsIndices, updatedMedoids)
+    return medoidsIndices == updatedMedoids
 end
