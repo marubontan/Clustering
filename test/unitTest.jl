@@ -51,6 +51,26 @@ end
     k = 2
     distanceMatrix = Distances.pairwise(Distances.SqEuclidean(), data)
 
+    @testset "randomlyAssignMediods" begin
+        @test isa(randomlyAssignMedoids(distanceMatrix, 2), Array)
+        @test length(randomlyAssignMedoids(distanceMatrix, 2)) == 2
+        medoidsIndices = randomlyAssignMedoids(distanceMatrix, 2)
+        @test medoidsIndices[1] != medoidsIndices[2]
+    end
+
+    @testset "updateMedoids" begin
+        @test isa(updateMedoids(distanceMatrix, rand(1:k, size(distanceMatrix)[1]), k), Array{Int})
+        @test length(updateMedoids(distanceMatrix, rand(1:k, size(distanceMatrix)[1]), k)) == 2
+        medoids = updateMedoids(distanceMatrix, rand(1:k, size(distanceMatrix)[1]), k)
+        @test medoids[1] != medoids[2]
+    end
+
+    @testset "updateGroupBelonging" begin
+        @test isa(updateGroupBelonging(distanceMatrix, [5, 10]), Array{Int})
+    end
+
+    @test returnArgumentMin([3, 1, 2]) == 2
+
     results = kMedoids(distanceMatrix, k)
 
     @test isa(results, kMedoidsResults)
