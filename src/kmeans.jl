@@ -7,6 +7,7 @@ type kMeansResults
     x::DataFrames.DataFrame
     k::Int
     estimatedClass::Array{Int}
+    centroids::Array{Array}
     iterCount::Int
     costArray::Array{Float64}
 end
@@ -38,11 +39,13 @@ function kMeans(data::DataFrame, k::Int)
     estimatedClass = assignRandomKClass(dataPointsNum, k)
 
     iterCount = 0
+    centroidsArray = []
     costArray = Float64[]
     while true
 
         # update
         centroids = updateRepresentative(data, estimatedClass, k)
+        push!(centroidsArray, centroids)
         tempEstimatedClass, cost = updateGroupBelonging(data, dataPointsNum, centroids, k)
 
         push!(costArray, cost)
@@ -55,7 +58,7 @@ function kMeans(data::DataFrame, k::Int)
         estimatedClass = tempEstimatedClass
         iterCount += 1
     end
-    return kMeansResults(data, k, estimatedClass, iterCount, costArray)
+    return kMeansResults(data, k, estimatedClass, centroidsArray, iterCount, costArray)
 end
 
 function assignRandomKClass(dataPointsNum, k)
