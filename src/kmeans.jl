@@ -41,8 +41,8 @@ function kMeans(data::DataFrame, k::Int)
     while true
 
         # update
-        representativePoints = updateRepresentative(data, estimatedClass, k)
-        tempEstimatedClass, cost = updateGroupBelonging(data, dataPointsNum, representativePoints, k)
+        centroids = updateRepresentative(data, estimatedClass, k)
+        tempEstimatedClass, cost = updateGroupBelonging(data, dataPointsNum, centroids, k)
 
         push!(costArray, cost)
 
@@ -64,26 +64,26 @@ function assignRandomKClass(dataPointsNum, k)
 end
 
 function updateRepresentative(data::DataFrame, estimatedClass::Array{Int}, k::Int)
-    representativePoints = Array{Array{Float64,1}}(k)
-    for representativeIndex in 1:k
-        groupIndex = find(estimatedClass .== representativeIndex)
+    centroids = Array{Array{Float64,1}}(k)
+    for centroidIndex in 1:k
+        groupIndex = find(estimatedClass .== centroidIndex)
         groupData = data[groupIndex, :]
 
-        representativePoint = [ valArray[1] for valArray in colwise(mean, groupData) ]
-        representativePoints[representativeIndex] = representativePoint
+        centroid = [ valArray[1] for valArray in colwise(mean, groupData) ]
+        centroids[centroidIndex] = centroid
     end
-    return representativePoints
+    return centroids
 end
 
-function updateGroupBelonging(data::DataFrame, dataPointsNum::Int, representativePoints::Array{Array{Float64, 1}}, k::Int)
+function updateGroupBelonging(data::DataFrame, dataPointsNum::Int, centroids::Array{Array{Float64, 1}}, k::Int)
     tempEstimatedClass = Array{Int}(dataPointsNum)
 
     cost = 0.0
     for dataIndex in 1:dataPointsNum
         dataPoint = Array(data[dataIndex, :])
         distances = Array{Float64}(k)
-        for representativeIndex in 1:k
-            distances[representativeIndex] = calcDist(dataPoint, representativePoints[representativeIndex])
+        for centroidIndex in 1:k
+            distances[centroidIndex] = calcDist(dataPoint, centroids[centroidIndex])
         end
 
         # TODO: check the existence of argmin
