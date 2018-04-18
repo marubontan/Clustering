@@ -1,4 +1,5 @@
 using DataFrames
+include("utils.jl")
 
 type kMedoidsResults
     x
@@ -82,12 +83,4 @@ end
 
 function referenceDistanceMatrix(distanceMatrix, representativeIndices::Array{Int})
     return distanceMatrix[representativeIndices, :]
-end
-
-function returnArgumentMin(targetArray::Array)
-    return sortperm(targetArray)[1]
-end
-
-function judgeConvergence(medoidsIndices, updatedMedoids)
-    return medoidsIndices == updatedMedoids
 end
