@@ -67,6 +67,7 @@ end
 
     @testset "updateGroupBelonging" begin
         @test isa(updateGroupBelonging(distanceMatrix, [5, 10]), Array{Int})
+        @test length(updateGroupBelonging(distanceMatrix, [5, 10])) == size(distanceMatrix)[1]
     end
 
     @test returnArgumentMin([3, 1, 2]) == 2
