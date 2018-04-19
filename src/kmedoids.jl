@@ -7,6 +7,7 @@ type kMedoidsResults
     estimatedClass::Array{Int}
     medoids::Array{Array}
     iterCount::Int
+    costArray::Array{Float64}
 end
 
 """
@@ -39,10 +40,12 @@ function kMedoids(distanceMatrix, k::Int)
     iterCount = 0
     updatedGroupInfo = []
     medoids = []
+    costArray = Float64[]
     while true
         updatedGroupInfo = updateGroupBelonging(distanceMatrix, medoidsIndices)
-        updatedMedoids = updateMedoids(distanceMatrix, updatedGroupInfo, k)
+        updatedMedoids, cost = updateMedoids(distanceMatrix, updatedGroupInfo, k)
         push!(medoids, updatedMedoids)
+        push!(costArray, cost)
 
         if judgeConvergence(medoidsIndices, updatedMedoids)
             iterCount += 1
@@ -51,7 +54,7 @@ function kMedoids(distanceMatrix, k::Int)
         medoidsIndices = updatedMedoids
         iterCount += 1
     end
-    return kMedoidsResults(distanceMatrix, k, updatedGroupInfo, medoids, iterCount, )
+    return kMedoidsResults(distanceMatrix, k, updatedGroupInfo, medoids, iterCount, costArray)
 end
 
 function randomlyAssignMedoids(distanceMatrix, k::Int)
@@ -61,14 +64,18 @@ end
 
 function updateMedoids(distanceMatrix, groupInfo, k::Int)
     medoidsIndices = Array{Int}(k)
+    cost = 0
     for class in 1:k
         classIndex = find(groupInfo .== class)
         classDistanceMatrix = distanceMatrix[classIndex, classIndex]
+
         distanceSum = vec(sum(classDistanceMatrix, 2))
+        cost += minimum(distanceSum)
+
         medoidIndex = classIndex[returnArgumentMin(distanceSum)]
         medoidsIndices[class] = medoidIndex
     end
-    return medoidsIndices
+    return medoidsIndices, cost
 end
 
 function updateGroupBelonging(distanceMatrix, representativeIndices::Array{Int})
