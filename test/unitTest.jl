@@ -59,10 +59,10 @@ end
     end
 
     @testset "updateMedoids" begin
-        @test isa(updateMedoids(distanceMatrix, rand(1:k, size(distanceMatrix)[1]), k), Array{Int})
-        @test length(updateMedoids(distanceMatrix, rand(1:k, size(distanceMatrix)[1]), k)) == 2
-        medoids = updateMedoids(distanceMatrix, rand(1:k, size(distanceMatrix)[1]), k)
-        @test medoids[1] != medoids[2]
+        updatedMedoids, cost = updateMedoids(distanceMatrix, rand(1:k, size(distanceMatrix)[1]), k)
+        @test isa(updatedMedoids, Array{Int})
+        @test length(updatedMedoids) == 2
+        @test updatedMedoids[1] != updatedMedoids[2]
     end
 
     @testset "updateGroupBelonging" begin
