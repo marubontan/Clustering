@@ -32,12 +32,35 @@ end
 
     data = makeData()
     k = 2
+
+    @testset "assignRandomClass" begin
+        randomClass = assignRandomKClass(size(data)[1], k)
+        @test randomClass[1] in 1:k
+        @test randomClass[2] in 1:k
+    end
+
+    @testset "updateCentroids" begin
+        randomClass = assignRandomKClass(size(data)[1], k)
+        centroids = updateCentroids(DataFrame(data), randomClass, k)
+        @test isa(centroids, Array{Array{Float64, 1}})
+        @test length(centroids) == k
+    end
+
+    @testset "updateGroupBelonging" begin
+        groupInfo, cost = updateGroupBelonging(DataFrame(data), size(data)[1], [[0.0, 0.0], [1.0, 2.0]], k)
+        @test isa(groupInfo, Array{Int})
+        @test isa(cost, Float64)
+        @test length(groupInfo) == size(data)[1]
+    end
+
     results = kMeans(DataFrame(data), k)
 
     @test isa(results, kMeansResults)
     @test size(results.x) == size(data)
     @test results.k == k
     @test length(results.estimatedClass) ==  size(data)[1]
+    @test length(results.centroids) == results.iterCount
+    @test length(results.costArray) == results.iterCount
 end
 
 @testset "K-medoids test" begin
@@ -78,4 +101,6 @@ end
     @test size(results.x) == size(distanceMatrix)
     @test results.k == k
     @test length(results.estimatedClass) ==  size(data)[2]
+    @test length(results.medoids) == results.iterCount
+    @test length(results.costArray) == results.iterCount
 end
