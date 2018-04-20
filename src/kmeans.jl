@@ -44,7 +44,7 @@ function kMeans(data::DataFrame, k::Int)
     while true
 
         # update
-        centroids = updateRepresentative(data, estimatedClass, k)
+        centroids = updateCentroids(data, estimatedClass, k)
         push!(centroidsArray, centroids)
         tempEstimatedClass, cost = updateGroupBelonging(data, dataPointsNum, centroids, k)
 
@@ -67,7 +67,7 @@ function assignRandomKClass(dataPointsNum, k)
     return estimatedClass
 end
 
-function updateRepresentative(data::DataFrame, estimatedClass::Array{Int}, k::Int)
+function updateCentroids(data::DataFrame, estimatedClass::Array{Int}, k::Int)
     centroids = Array{Array{Float64,1}}(k)
     for centroidIndex in 1:k
         groupIndex = find(estimatedClass .== centroidIndex)
