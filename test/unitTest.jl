@@ -39,6 +39,20 @@ end
         @test randomClass[2] in 1:k
     end
 
+    @testset "updateCentroids" begin
+        randomClass = assignRandomKClass(size(data)[1], k)
+        centroids = updateCentroids(DataFrame(data), randomClass, k)
+        @test isa(centroids, Array{Array{Float64, 1}})
+        @test length(centroids) == k
+    end
+
+    @testset "updateGroupBelonging" begin
+        groupInfo, cost = updateGroupBelonging(DataFrame(data), size(data)[1], [[0.0, 0.0], [1.0, 2.0]], k)
+        @test isa(groupInfo, Array{Int})
+        @test isa(cost, Float64)
+        @test length(groupInfo) == size(data)[1]
+    end
+
     results = kMeans(DataFrame(data), k)
 
     @test isa(results, kMeansResults)
