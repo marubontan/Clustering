@@ -1,7 +1,7 @@
 using DataFrames
 include("utils.jl")
 
-type kMedoidsResults
+struct kMedoidsResults
     x
     k::Int
     estimatedClass::Array{Int}
