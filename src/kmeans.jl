@@ -3,7 +3,7 @@ using StatsBase
 include("dist.jl")
 include("utils.jl")
 
-type kMeansResults
+struct kMeansResults
     x::DataFrames.DataFrame
     k::Int
     estimatedClass::Array{Int}
