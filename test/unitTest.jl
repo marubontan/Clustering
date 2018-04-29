@@ -46,8 +46,30 @@ end
         @test length(centroids) == k
     end
 
+    @testset "assignDataOnEmptyCluster" begin
+        x = [1, 1, 3, 3, 7, 7, 9, 9]
+        y = [8, 10, 8, 10, 1, 3, 1, 3]
+        dataOne = DataFrame(x=x, y=y)
+        labelOne = [1, 1, 1, 1, 2, 2, 2, 2]
+        centerOne = [[2, 9], [8, 2], [NaN, NaN]]
+        nearestDistOne = [sqrt(2), sqrt(2), sqrt(2), sqrt(2), sqrt(2), sqrt(2), sqrt(2), sqrt(2)]
+        updatedCenterOne = assignDataOnEmptyCluster(dataOne, labelOne, centerOne, nearestDistOne)
+
+        @test updatedCenterOne[1:2] == centerOne[1:2]
+        @test findEmptyCluster(labelOne, centerOne) == [3]
+
+        arrayOne = [1,2,3,4]
+        @test makeValuesProbabilistic(arrayOne) == [0.1, 0.2, 0.3, 0.4]
+        probOne = [0.2, 0.4, 0.1, 0.3]
+        k = 2
+        pickedUp = stochasticallyPickUp(arrayOne, probOne, k)
+        @test length(pickedUp) == k
+        @test typeof(pickedUp[1]) == Int
+
+    end
+
     @testset "updateGroupBelonging" begin
-        groupInfo, cost = updateGroupBelonging(DataFrame(data), size(data)[1], [[0.0, 0.0], [1.0, 2.0]], k)
+        groupInfo, cost, nearestDist = updateGroupBelonging(DataFrame(data), size(data)[1], [[0.0, 0.0], [1.0, 2.0]], k)
         @test isa(groupInfo, Array{Int})
         @test isa(cost, Float64)
         @test length(groupInfo) == size(data)[1]
@@ -55,12 +77,13 @@ end
 
     results = kMeans(DataFrame(data), k)
 
-    @test isa(results, kMeansResults)
+    @test isa(results, KMeansResults)
     @test size(results.x) == size(data)
     @test results.k == k
     @test length(results.estimatedClass) ==  size(data)[1]
     @test length(results.centroids) == results.iterCount
     @test length(results.costArray) == results.iterCount
+    @test length(Set(results.estimatedClass)) == k
 end
 
 @testset "K-medoids test" begin
