@@ -83,6 +83,7 @@ end
     @test length(results.estimatedClass) ==  size(data)[1]
     @test length(results.centroids) == results.iterCount
     @test length(results.costArray) == results.iterCount
+    @test length(Set(results.estimatedClass)) == k
 end
 
 @testset "K-medoids test" begin

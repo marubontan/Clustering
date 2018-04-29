@@ -40,15 +40,22 @@ function kMeans(data::DataFrame, k::Int)
 
     iterCount = 0
     centroidsArray = []
+    centroids = updateCentroids(data, estimatedClass, k)
     costArray = Float64[]
     while true
 
         # update
-        centroids = updateCentroids(data, estimatedClass, k)
-        push!(centroidsArray, centroids)
         tempEstimatedClass, cost, nearestDist = updateGroupBelonging(data, dataPointsNum, centroids, k)
 
         push!(costArray, cost)
+
+        centroids = updateCentroids(data, estimatedClass, k)
+
+        if length(Set(tempEstimatedClass)) < k
+            centroids = assignDataOnEmptyCluster(data, estimatedClass, centroids, nearestDist)
+        end
+
+        push!(centroidsArray, centroids)
 
         if judgeConvergence(estimatedClass, tempEstimatedClass)
             iterCount += 1
