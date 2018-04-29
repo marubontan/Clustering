@@ -3,7 +3,7 @@ using StatsBase
 include("dist.jl")
 include("utils.jl")
 
-struct kMeansResults
+struct KMeansResults
     x::DataFrames.DataFrame
     k::Int
     estimatedClass::Array{Int}
@@ -24,7 +24,7 @@ Do clustering to data with K-means algorithm.
 # Examples
 ```julia-kMeans
 julia> kMeans(DataFrame(x = [1,2,3], y = [4,5,6]),2)
-kMeansResults(3×2 DataFrames.DataFrame
+KMeansResults(3×2 DataFrames.DataFrame
 │ Row │ x │ y │
 ├─────┼───┼───┤
 │ 1   │ 1 │ 4 │
@@ -65,7 +65,7 @@ function kMeans(data::DataFrame, k::Int)
         estimatedClass = tempEstimatedClass
         iterCount += 1
     end
-    return kMeansResults(data, k, estimatedClass, centroidsArray, iterCount, costArray)
+    return KMeansResults(data, k, estimatedClass, centroidsArray, iterCount, costArray)
 end
 
 function assignRandomKClass(dataPointsNum, k)
@@ -98,24 +98,21 @@ function updateGroupBelonging(data::DataFrame, dataPointsNum::Int, centroids::Ar
             distances[centroidIndex] = calcDist(dataPoint, centroids[centroidIndex])
         end
 
-        # TODO: check the existence of argmin
-        # TODO: this cost calculation is bad hack
         push!(distanceBetweenDataPointAndNearestCentroid, minimum(distances))
         classIndex = returnArgumentMin(distances)
         tempEstimatedClass[dataIndex] = classIndex
+
+        # TODO: this cost calculation is bad hack
         cost += distances[classIndex] ^ 2
     end
     return tempEstimatedClass, cost, distanceBetweenDataPointAndNearestCentroid
 end
 
 function assignDataOnEmptyCluster(data::DataFrame, label, centers, nearestDist)
-    # find empty cluster
     emptyCluster = findEmptyCluster(label, centers)
-    # make the distance array probabilistic
     nearestDistProb = makeValuesProbabilistic(nearestDist)
-    # stochastically pick up the centroids
     pickedDataPointsIndex = stochasticallyPickUp(Array(1:nrow(data)), nearestDistProb, length(emptyCluster))
-    # update the vanished centroids
+
     for (i,cluster) in enumerate(emptyCluster)
         centers[cluster] = vec(Array(data[pickedDataPointsIndex[i], :]))
     end
@@ -131,22 +128,25 @@ function makeValuesProbabilistic(values)
     return values / sum(values)
 end
 
-function stochasticallyPickUp(values, probs, k)
+function stochasticallyPickUp(values, probs, n)
     indexProb = Dict()
     for key in 1:length(values)
         indexProb[key] = probs[key]
     end
 
-    newCluster = []
-    for i in 1:k
+    pickedValues = []
+    for _ in 1:n
         border = rand(1)[1]
 
         sum = 0
         for pair in indexProb
             sum += pair[2]
             if sum > border
-                push!(newCluster, pair[1])
+                push!(pickedValues, pair[1])
+
+                # TODO: it's bad hack to delte the loop target in the loop
                 delete!(indexProb, pair[1])
+
                 denominator = 1 - pair[2]
                 for (key,val) in indexProb
                     indexProb[key] = val / denominator
@@ -155,5 +155,5 @@ function stochasticallyPickUp(values, probs, k)
             end
         end
     end
-    return newCluster
+    return pickedValues
 end

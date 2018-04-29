@@ -77,7 +77,7 @@ end
 
     results = kMeans(DataFrame(data), k)
 
-    @test isa(results, kMeansResults)
+    @test isa(results, KMeansResults)
     @test size(results.x) == size(data)
     @test results.k == k
     @test length(results.estimatedClass) ==  size(data)[1]
