@@ -46,7 +46,7 @@ function kMeans(data::DataFrame, k::Int)
         # update
         centroids = updateCentroids(data, estimatedClass, k)
         push!(centroidsArray, centroids)
-        tempEstimatedClass, cost = updateGroupBelonging(data, dataPointsNum, centroids, k)
+        tempEstimatedClass, cost, nearestDist = updateGroupBelonging(data, dataPointsNum, centroids, k)
 
         push!(costArray, cost)
 
@@ -83,6 +83,7 @@ function updateGroupBelonging(data::DataFrame, dataPointsNum::Int, centroids::Ar
     tempEstimatedClass = Array{Int}(dataPointsNum)
 
     cost = 0.0
+    distanceBetweenDataPointAndNearestCentroid = []
     for dataIndex in 1:dataPointsNum
         dataPoint = Array(data[dataIndex, :])
         distances = Array{Float64}(k)
@@ -92,9 +93,63 @@ function updateGroupBelonging(data::DataFrame, dataPointsNum::Int, centroids::Ar
 
         # TODO: check the existence of argmin
         # TODO: this cost calculation is bad hack
+        push!(distanceBetweenDataPointAndNearestCentroid, minimum(distances))
         classIndex = returnArgumentMin(distances)
         tempEstimatedClass[dataIndex] = classIndex
         cost += distances[classIndex] ^ 2
     end
-    return tempEstimatedClass, cost
+    return tempEstimatedClass, cost, distanceBetweenDataPointAndNearestCentroid
+end
+
+function assignDataOnEmptyCluster(data::DataFrame, label, centers, nearestDist)
+    # find empty cluster
+    emptyCluster = findEmptyCluster(label, centers)
+    # make the distance array probabilistic
+    nearestDistProb = makeValuesProbabilistic(nearestDist)
+    # stochastically pick up the centroids
+    pickedDataPointsIndex = stochasticallyPickUp(nrow(data), nearestDistProb, length(emptyCluster))
+    # update the vanished centroids
+    for (i,cluster) in enumerate(emptyCluster)
+        println(centers[cluster])
+        println(pickedDataPointsIndex)
+        println(vec(Array(data[pickedDataPointsIndex[i], :])))
+        centers[cluster] = vec(Array(data[pickedDataPointsIndex[i], :]))
+    end
+    return [[2,9], [8,2],[9,3]]
+end
+
+function findEmptyCluster(label, centers)
+    emptyCluster = collect(setdiff(Set(1:length(centers)), Set(label)))
+    return emptyCluster
+end
+
+function makeValuesProbabilistic(values)
+    return values / sum(values)
+end
+
+function stochasticallyPickUp(values, probs, k)
+    indexProb = Dict()
+    for key in 1:length(values)
+        indexProb[key] = probs[key]
+    end
+
+    newCluster = []
+    for i in 1:k
+        border = rand(1)[1]
+
+        sum = 0
+        for pair in indexProb
+            sum += pair[2]
+            if sum > border
+                push!(newCluster, pair[1])
+                delete!(indexProb, pair[1])
+                denominator = 1 - pair[2]
+                for (k,v) in indexProb
+                    indexProb[k] = v / denominator
+                end
+                break
+            end
+        end
+    end
+    return newCluster
 end

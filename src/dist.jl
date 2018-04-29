@@ -21,6 +21,7 @@ function euclidean(sourcePoint::Array, destPoint::Array)
         sum += (destPoint[i] - sourcePoint[i]) ^ 2
     end
     dist = sqrt(sum)
+    println(typeof(dist))
     return dist
 end
 
