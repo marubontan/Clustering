@@ -107,15 +107,12 @@ function assignDataOnEmptyCluster(data::DataFrame, label, centers, nearestDist)
     # make the distance array probabilistic
     nearestDistProb = makeValuesProbabilistic(nearestDist)
     # stochastically pick up the centroids
-    pickedDataPointsIndex = stochasticallyPickUp(nrow(data), nearestDistProb, length(emptyCluster))
+    pickedDataPointsIndex = stochasticallyPickUp(Array(1:nrow(data)), nearestDistProb, length(emptyCluster))
     # update the vanished centroids
     for (i,cluster) in enumerate(emptyCluster)
-        println(centers[cluster])
-        println(pickedDataPointsIndex)
-        println(vec(Array(data[pickedDataPointsIndex[i], :])))
         centers[cluster] = vec(Array(data[pickedDataPointsIndex[i], :]))
     end
-    return [[2,9], [8,2],[9,3]]
+    return centers
 end
 
 function findEmptyCluster(label, centers)
@@ -144,8 +141,8 @@ function stochasticallyPickUp(values, probs, k)
                 push!(newCluster, pair[1])
                 delete!(indexProb, pair[1])
                 denominator = 1 - pair[2]
-                for (k,v) in indexProb
-                    indexProb[k] = v / denominator
+                for (key,val) in indexProb
+                    indexProb[key] = val / denominator
                 end
                 break
             end
