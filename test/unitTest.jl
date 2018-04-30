@@ -75,6 +75,33 @@ end
         @test length(groupInfo) == size(data)[1]
     end
 
+    @testset "kMeans++" begin
+        xA = [1.0, 2.0, 2.0, 3.0]
+        yA = [3.0, 2.0, 3.0, 8.0]
+        dataA = DataFrame(x=xA, y=yA)
+        k = 2
+        @test_nowarn kMeansPlusPlus(dataA, k)
+        dataADict = Dict(1 => [1.0, 3.0], 2 => [2.0, 2.0], 3 => [2.0, 3.0], 4 => [3.0, 8.0])
+        @test dataFrameToDict(dataA) == dataADict
+        ind, coordinate = randomlyChooseOneDataPoint(dataADict)
+        @test coordinate in [[1.0, 3.0], [2.0, 2.0], [2.0, 3.0], [3.0, 8.0]]
+
+        indA = 2
+        @test_nowarn calcDistBetweenCenterAndDataPoints(dataADict, indA)
+        @test makeDictValueProbabilistic(Dict(1 => 1.0, 2 => 4.0)) == Dict(1 => 0.2, 2 => 0.8)
+
+        dictA = Dict(1 => 0.2, 2 => 0.4, 3 => 0.1, 4 => 0.3)
+        n = 2
+        @test_nowarn wrapperToStochasticallyPickUp(dictA, n)
+        pickedUp = wrapperToStochasticallyPickUp(dictA, n)
+        @test length(pickedUp) == n
+        @test typeof(pickedUp[1]) == Int
+
+        dataFrameA = DataFrame(x=[1,2,3], y=[3,4,5])
+        @test dataFrame2JaggedArray(dataFrameA) == [[1, 3], [2, 4], [3, 5]]
+
+    end
+
     results = kMeans(DataFrame(data), k)
 
     @test isa(results, KMeansResults)

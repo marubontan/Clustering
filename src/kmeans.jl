@@ -157,3 +157,73 @@ function stochasticallyPickUp(values, probs, n)
     end
     return pickedValues
 end
+
+function kMeansPlusPlus(data::DataFrame, k::Int)
+    dataDict = dataFrameToDict(data)
+    ind, centroid = randomlyChooseOneDataPoint(dataDict)
+    distanceDict = calcDistBetweenCenterAndDataPoints(dataDict, ind)
+    distanceProbDict = makeDictValueProbabilistic(distanceDict)
+    centroidsIndex = wrapperToStochasticallyPickUp(distanceProbDict, k)
+    centroids = dataFrame2JaggedArray(data[Int.(centroidsIndex), :])
+    return centroids
+end
+
+function randomlyChooseOneDataPoint(data::Dict)
+    randomIndex = rand([k for k in keys(data)], 1)[1]
+    return randomIndex, data[randomIndex]
+end
+
+function dataFrameToDict(data::DataFrame)
+
+    indexDataDict = Dict()
+    for i in 1:nrow(data)
+        indexDataDict[i] = vec(Array(data[i, :]))
+    end
+
+    return indexDataDict
+end
+
+function calcDistBetweenCenterAndDataPoints(data::Dict, index::Int)
+    center = data[index]
+    distanceDict = Dict()
+    for pair in data
+        if pair[1] == index
+            continue
+        end
+
+        distanceDict[pair[1]] = calcDist(center, pair[2])
+    end
+    return distanceDict
+end
+
+function makeDictValueProbabilistic(data)
+    vals = [v for v in values(data)]
+    valsSum = sum(vals)
+
+    for pair in data
+        data[pair[1]] = pair[2] / valsSum
+    end
+
+    return data
+end
+
+function wrapperToStochasticallyPickUp(data::Dict, n::Int)
+    index = []
+    probs = []
+    for pair in data
+        push!(index, pair[1])
+        push!(probs, pair[2])
+    end
+
+    return stochasticallyPickUp(index, probs, n)
+end
+
+function dataFrame2JaggedArray(data::DataFrame)
+    returnArray = []
+    for i in 1:nrow(data)
+        push!(returnArray, vec(Array(data[i,:])))
+    end
+    return returnArray
+end
+
+
