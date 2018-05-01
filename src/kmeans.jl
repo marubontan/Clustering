@@ -32,15 +32,19 @@ KMeansResults(3×2 DataFrames.DataFrame
 │ 3   │ 3 │ 6 │, 2, [1, 1, 1], 1, [4.0])
 ```
 """
-function kMeans(data::DataFrame, k::Int)
+function kMeans(data::DataFrame, k::Int; initializer=nothing)
 
     # initialize
     dataPointsNum = size(data, 1)
     estimatedClass = assignRandomKClass(dataPointsNum, k)
+    if initializer == "kmeans++"
+        centroids = kMeansPlusPlus(data, k)
+    else
+        centroids = updateCentroids(data, estimatedClass, k)
+    end
 
     iterCount = 0
     centroidsArray = []
-    centroids = updateCentroids(data, estimatedClass, k)
     costArray = Float64[]
     while true
 
@@ -49,10 +53,10 @@ function kMeans(data::DataFrame, k::Int)
 
         push!(costArray, cost)
 
-        centroids = updateCentroids(data, estimatedClass, k)
+        centroids = updateCentroids(data, tempEstimatedClass, k)
 
         if length(Set(tempEstimatedClass)) < k
-            centroids = assignDataOnEmptyCluster(data, estimatedClass, centroids, nearestDist)
+            centroids = assignDataOnEmptyCluster(data, tempEstimatedClass, centroids, nearestDist)
         end
 
         push!(centroidsArray, centroids)
@@ -86,7 +90,7 @@ function updateCentroids(data::DataFrame, estimatedClass::Array{Int}, k::Int)
     return centroids
 end
 
-function updateGroupBelonging(data::DataFrame, dataPointsNum::Int, centroids::Array{Array{Float64, 1}}, k::Int)
+function updateGroupBelonging(data::DataFrame, dataPointsNum::Int, centroids::Array, k::Int)
     tempEstimatedClass = Array{Int}(dataPointsNum)
 
     cost = 0.0
@@ -225,5 +229,4 @@ function dataFrame2JaggedArray(data::DataFrame)
     end
     return returnArray
 end
-
 

@@ -102,15 +102,25 @@ end
 
     end
 
-    results = kMeans(DataFrame(data), k)
+    resultsA = kMeans(DataFrame(data), k)
 
-    @test isa(results, KMeansResults)
-    @test size(results.x) == size(data)
-    @test results.k == k
-    @test length(results.estimatedClass) ==  size(data)[1]
-    @test length(results.centroids) == results.iterCount
-    @test length(results.costArray) == results.iterCount
-    @test length(Set(results.estimatedClass)) == k
+    @test isa(resultsA, KMeansResults)
+    @test size(resultsA.x) == size(data)
+    @test resultsA.k == k
+    @test length(resultsA.estimatedClass) ==  size(data)[1]
+    @test length(resultsA.centroids) == resultsA.iterCount
+    @test length(resultsA.costArray) == resultsA.iterCount
+    @test length(Set(resultsA.estimatedClass)) == k
+
+    resultsB = kMeans(DataFrame(data), k; initializer="kmeans++")
+
+    @test isa(resultsB, KMeansResults)
+    @test size(resultsB.x) == size(data)
+    @test resultsB.k == k
+    @test length(resultsB.estimatedClass) ==  size(data)[1]
+    @test length(resultsB.centroids) == resultsB.iterCount
+    @test length(resultsB.costArray) == resultsB.iterCount
+    @test length(Set(resultsB.estimatedClass)) == k
 end
 
 @testset "K-medoids test" begin
