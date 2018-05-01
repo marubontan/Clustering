@@ -32,15 +32,19 @@ KMeansResults(3×2 DataFrames.DataFrame
 │ 3   │ 3 │ 6 │, 2, [1, 1, 1], 1, [4.0])
 ```
 """
-function kMeans(data::DataFrame, k::Int)
+function kMeans(data::DataFrame, k::Int; initializer=nothing)
 
     # initialize
     dataPointsNum = size(data, 1)
     estimatedClass = assignRandomKClass(dataPointsNum, k)
+    if initializer == "kmeans++"
+        centroids = kMeansPlusPlus(data, k)
+    else
+        centroids = updateCentroids(data, estimatedClass, k)
+    end
 
     iterCount = 0
     centroidsArray = []
-    centroids = updateCentroids(data, estimatedClass, k)
     costArray = Float64[]
     while true
 
@@ -49,10 +53,10 @@ function kMeans(data::DataFrame, k::Int)
 
         push!(costArray, cost)
 
-        centroids = updateCentroids(data, estimatedClass, k)
+        centroids = updateCentroids(data, tempEstimatedClass, k)
 
         if length(Set(tempEstimatedClass)) < k
-            centroids = assignDataOnEmptyCluster(data, estimatedClass, centroids, nearestDist)
+            centroids = assignDataOnEmptyCluster(data, tempEstimatedClass, centroids, nearestDist)
         end
 
         push!(centroidsArray, centroids)
@@ -86,7 +90,7 @@ function updateCentroids(data::DataFrame, estimatedClass::Array{Int}, k::Int)
     return centroids
 end
 
-function updateGroupBelonging(data::DataFrame, dataPointsNum::Int, centroids::Array{Array{Float64, 1}}, k::Int)
+function updateGroupBelonging(data::DataFrame, dataPointsNum::Int, centroids::Array, k::Int)
     tempEstimatedClass = Array{Int}(dataPointsNum)
 
     cost = 0.0
@@ -157,3 +161,72 @@ function stochasticallyPickUp(values, probs, n)
     end
     return pickedValues
 end
+
+function kMeansPlusPlus(data::DataFrame, k::Int)
+    dataDict = dataFrameToDict(data)
+    ind = randomlyChooseOneDataPoint(dataDict)
+    distanceDict = calcDistBetweenCenterAndDataPoints(dataDict, ind)
+    distanceProbDict = makeDictValueProbabilistic(distanceDict)
+    centroidsIndex = wrapperToStochasticallyPickUp(distanceProbDict, k)
+    centroids = dataFrame2JaggedArray(data[Int.(centroidsIndex), :])
+    return centroids
+end
+
+function randomlyChooseOneDataPoint(data::Dict)
+    randomIndex = rand([k for k in keys(data)], 1)[1]
+    return randomIndex
+end
+
+function dataFrameToDict(data::DataFrame)
+
+    indexDataDict = Dict()
+    for i in 1:nrow(data)
+        indexDataDict[i] = vec(Array(data[i, :]))
+    end
+
+    return indexDataDict
+end
+
+function calcDistBetweenCenterAndDataPoints(data::Dict, centerIndex::Int)
+    center = data[centerIndex]
+    distanceDict = Dict()
+    for pair in data
+        if pair[1] == centerIndex
+            continue
+        end
+
+        distanceDict[pair[1]] = calcDist(center, pair[2])
+    end
+    return distanceDict
+end
+
+function makeDictValueProbabilistic(data)
+    vals = [v for v in values(data)]
+    valsSum = sum(vals)
+
+    for pair in data
+        data[pair[1]] = pair[2] / valsSum
+    end
+
+    return data
+end
+
+function wrapperToStochasticallyPickUp(data::Dict, n::Int)
+    index = []
+    probs = []
+    for pair in data
+        push!(index, pair[1])
+        push!(probs, pair[2])
+    end
+
+    return stochasticallyPickUp(index, probs, n)
+end
+
+function dataFrame2JaggedArray(data::DataFrame)
+    returnArray = []
+    for i in 1:nrow(data)
+        push!(returnArray, vec(Array(data[i,:])))
+    end
+    return returnArray
+end
+

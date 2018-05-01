@@ -11,7 +11,7 @@ end
 function main()
     data = makeData()
 
-    kmeansResult = kMeans(DataFrame(data), 2)
+    kmeansResult = kMeans(DataFrame(data), 2; initializer="kmeans++")
     print(kmeansResult)
 end
 

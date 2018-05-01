@@ -75,15 +75,52 @@ end
         @test length(groupInfo) == size(data)[1]
     end
 
-    results = kMeans(DataFrame(data), k)
+    @testset "kMeans++" begin
+        xA = [1.0, 2.0, 2.0, 3.0]
+        yA = [3.0, 2.0, 3.0, 8.0]
+        dataA = DataFrame(x=xA, y=yA)
+        k = 2
+        @test_nowarn kMeansPlusPlus(dataA, k)
+        dataADict = Dict(1 => [1.0, 3.0], 2 => [2.0, 2.0], 3 => [2.0, 3.0], 4 => [3.0, 8.0])
+        @test dataFrameToDict(dataA) == dataADict
+        ind = randomlyChooseOneDataPoint(dataADict)
+        @test ind in [1, 2, 3, 4]
 
-    @test isa(results, KMeansResults)
-    @test size(results.x) == size(data)
-    @test results.k == k
-    @test length(results.estimatedClass) ==  size(data)[1]
-    @test length(results.centroids) == results.iterCount
-    @test length(results.costArray) == results.iterCount
-    @test length(Set(results.estimatedClass)) == k
+        indA = 2
+        @test_nowarn calcDistBetweenCenterAndDataPoints(dataADict, indA)
+        @test makeDictValueProbabilistic(Dict(1 => 1.0, 2 => 4.0)) == Dict(1 => 0.2, 2 => 0.8)
+
+        dictA = Dict(1 => 0.2, 2 => 0.4, 3 => 0.1, 4 => 0.3)
+        n = 2
+        @test_nowarn wrapperToStochasticallyPickUp(dictA, n)
+        pickedUp = wrapperToStochasticallyPickUp(dictA, n)
+        @test length(pickedUp) == n
+        @test typeof(pickedUp[1]) == Int
+
+        dataFrameA = DataFrame(x=[1,2,3], y=[3,4,5])
+        @test dataFrame2JaggedArray(dataFrameA) == [[1, 3], [2, 4], [3, 5]]
+
+    end
+
+    resultsA = kMeans(DataFrame(data), k)
+
+    @test isa(resultsA, KMeansResults)
+    @test size(resultsA.x) == size(data)
+    @test resultsA.k == k
+    @test length(resultsA.estimatedClass) ==  size(data)[1]
+    @test length(resultsA.centroids) == resultsA.iterCount
+    @test length(resultsA.costArray) == resultsA.iterCount
+    @test length(Set(resultsA.estimatedClass)) == k
+
+    resultsB = kMeans(DataFrame(data), k; initializer="kmeans++")
+
+    @test isa(resultsB, KMeansResults)
+    @test size(resultsB.x) == size(data)
+    @test resultsB.k == k
+    @test length(resultsB.estimatedClass) ==  size(data)[1]
+    @test length(resultsB.centroids) == resultsB.iterCount
+    @test length(resultsB.costArray) == resultsB.iterCount
+    @test length(Set(resultsB.estimatedClass)) == k
 end
 
 @testset "K-medoids test" begin
