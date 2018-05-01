@@ -83,8 +83,8 @@ end
         @test_nowarn kMeansPlusPlus(dataA, k)
         dataADict = Dict(1 => [1.0, 3.0], 2 => [2.0, 2.0], 3 => [2.0, 3.0], 4 => [3.0, 8.0])
         @test dataFrameToDict(dataA) == dataADict
-        ind, coordinate = randomlyChooseOneDataPoint(dataADict)
-        @test coordinate in [[1.0, 3.0], [2.0, 2.0], [2.0, 3.0], [3.0, 8.0]]
+        ind = randomlyChooseOneDataPoint(dataADict)
+        @test ind in [1, 2, 3, 4]
 
         indA = 2
         @test_nowarn calcDistBetweenCenterAndDataPoints(dataADict, indA)

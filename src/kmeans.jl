@@ -164,7 +164,7 @@ end
 
 function kMeansPlusPlus(data::DataFrame, k::Int)
     dataDict = dataFrameToDict(data)
-    ind, centroid = randomlyChooseOneDataPoint(dataDict)
+    ind = randomlyChooseOneDataPoint(dataDict)
     distanceDict = calcDistBetweenCenterAndDataPoints(dataDict, ind)
     distanceProbDict = makeDictValueProbabilistic(distanceDict)
     centroidsIndex = wrapperToStochasticallyPickUp(distanceProbDict, k)
@@ -174,7 +174,7 @@ end
 
 function randomlyChooseOneDataPoint(data::Dict)
     randomIndex = rand([k for k in keys(data)], 1)[1]
-    return randomIndex, data[randomIndex]
+    return randomIndex
 end
 
 function dataFrameToDict(data::DataFrame)
@@ -187,11 +187,11 @@ function dataFrameToDict(data::DataFrame)
     return indexDataDict
 end
 
-function calcDistBetweenCenterAndDataPoints(data::Dict, index::Int)
-    center = data[index]
+function calcDistBetweenCenterAndDataPoints(data::Dict, centerIndex::Int)
+    center = data[centerIndex]
     distanceDict = Dict()
     for pair in data
-        if pair[1] == index
+        if pair[1] == centerIndex
             continue
         end
 
