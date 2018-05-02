@@ -121,6 +121,7 @@ end
     @test length(resultsB.estimatedClass) ==  size(data)[1]
     @test length(resultsB.centroids) == resultsB.iterCount
     @test length(resultsB.costArray) == resultsB.iterCount
+    @test length(Set(resultsB.estimatedClass)) == k
 
     @testset "mnist" begin
         train_x, train_y = MNIST.traindata()
