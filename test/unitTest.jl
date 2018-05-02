@@ -1,6 +1,7 @@
 using Base.Test
 using Distributions
 using DataFrames
+using MLDatasets
 import Distances
 include("../src/dist.jl")
 include("../src/kmeans.jl")
@@ -120,7 +121,17 @@ end
     @test length(resultsB.estimatedClass) ==  size(data)[1]
     @test length(resultsB.centroids) == resultsB.iterCount
     @test length(resultsB.costArray) == resultsB.iterCount
-    @test length(Set(resultsB.estimatedClass)) == k
+
+    @testset "mnist" begin
+        train_x, train_y = MNIST.traindata()
+        sub_x = zeros(100, 784)
+        for i in 1:100
+            sub_x[i, :] = 255 .* vec(train_x[:,:,i])
+        end
+
+        @test_nowarn kMeans(DataFrame(sub_x), 10)
+        @test_nowarn kMeans(DataFrame(sub_x), 10; initializer="kmeans++")
+    end
 end
 
 @testset "K-medoids test" begin
