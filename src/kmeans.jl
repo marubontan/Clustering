@@ -166,7 +166,6 @@ function kMeansPlusPlus(data::DataFrame, k::Int)
     dataDict = dataFrameToDict(data)
     ind = randomlyChooseOneDataPoint(dataDict)
     distanceDict = calcDistBetweenCenterAndDataPoints(dataDict, ind)
-    # pop ind from distanceDict
     delete!(distanceDict, ind)
 
     distanceProbDict = makeDictValueProbabilistic(distanceDict)
@@ -176,10 +175,11 @@ function kMeansPlusPlus(data::DataFrame, k::Int)
         centroidsIndex = wrapperToStochasticallyPickUp(distanceProbDict, 1)[1]
         push!(centroidsIndices, centroidsIndex)
 
-        # update distance dictionary
-        distanceDict = updateDistanceDict(distanceDict, dataDict, centroidsIndex)
+        if i == k-1
+            break
+        end
 
-        # pop centroidsIndex from distanceDict
+        distanceDict = updateDistanceDict(distanceDict, dataDict, centroidsIndex)
         delete!(distanceDict, centroidsIndex)
 
         distanceProbDict = makeDictValueProbabilistic(distanceDict)
@@ -258,3 +258,4 @@ function updateDistanceDict(distanceDict, dataDict, ind)
     end
     return distanceDict
 end
+
