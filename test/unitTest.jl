@@ -100,6 +100,11 @@ end
         dataFrameA = DataFrame(x=[1,2,3], y=[3,4,5])
         @test dataFrame2JaggedArray(dataFrameA) == [[1, 3], [2, 4], [3, 5]]
 
+        distanceDict = Dict(1 => 10.0, 2 => 20.0, 3 => 30.0)
+        dataDict = Dict(1 => [0.0, 0.0], 2 => [1.0, 1.0], 3 => [100.0, 100.0])
+        ind = 1
+        @test updateDistanceDict(distanceDict, dataDict, ind) == Dict(1 => 10.0, 2 => sqrt(2), 3 => 30.0)
+
     end
 
     resultsA = kMeans(DataFrame(data), k)

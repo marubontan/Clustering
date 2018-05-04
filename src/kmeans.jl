@@ -166,9 +166,26 @@ function kMeansPlusPlus(data::DataFrame, k::Int)
     dataDict = dataFrameToDict(data)
     ind = randomlyChooseOneDataPoint(dataDict)
     distanceDict = calcDistBetweenCenterAndDataPoints(dataDict, ind)
+    # pop ind from distanceDict
+    delete!(distanceDict, ind)
+
     distanceProbDict = makeDictValueProbabilistic(distanceDict)
-    centroidsIndex = wrapperToStochasticallyPickUp(distanceProbDict, k)
-    centroids = dataFrame2JaggedArray(data[Int.(centroidsIndex), :])
+
+    centroidsIndices = [ind]
+    for i in 1:k-1
+        centroidsIndex = wrapperToStochasticallyPickUp(distanceProbDict, 1)[1]
+        push!(centroidsIndices, centroidsIndex)
+
+        # update distance dictionary
+        distanceDict = updateDistanceDict(distanceDict, dataDict, centroidsIndex)
+
+        # pop centroidsIndex from distanceDict
+        delete!(distanceDict, centroidsIndex)
+
+        distanceProbDict = makeDictValueProbabilistic(distanceDict)
+    end
+
+    centroids = dataFrame2JaggedArray(data[Int.(centroidsIndices), :])
     return centroids
 end
 
@@ -230,3 +247,14 @@ function dataFrame2JaggedArray(data::DataFrame)
     return returnArray
 end
 
+function updateDistanceDict(distanceDict, dataDict, ind)
+    distanceBetweenNewCentroidAndDataPoints = calcDistBetweenCenterAndDataPoints(dataDict, ind)
+    for pair in distanceDict
+        if pair[1] != ind
+            if pair[2] > distanceBetweenNewCentroidAndDataPoints[pair[1]]
+                distanceDict[pair[1]] = distanceBetweenNewCentroidAndDataPoints[pair[1]]
+            end
+        end
+    end
+    return distanceDict
+end
