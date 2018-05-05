@@ -11,7 +11,7 @@ end
 sub_y = train_y[1:100]
 
 function main()
-    kmeansResult = kMeans(DataFrame(sub_x), 10)
+    kmeansResult = kMeans(DataFrame(sub_x), 10; initializer="kmeans++")
     println(kmeansResult.estimatedClass)
 end
 

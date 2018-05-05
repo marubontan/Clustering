@@ -44,7 +44,7 @@ end
 
 function dataFrameToDict(data::DataFrame)
 
-    indexDataDict = Dict{Int, Array}()
+    indexDataDict = Dict{Int, Array{Float64, 1}}()
     for i in 1:nrow(data)
         indexDataDict[i] = vec(Array(data[i, :]))
     end
@@ -55,7 +55,7 @@ end
 
 function calcDistBetweenCenterAndDataPoints(data::Dict, centerIndex::Int)
     center = data[centerIndex]
-    distanceDict = Dict()
+    distanceDict = Dict{Int, Float64}()
     for pair in data
         distanceDict[pair[1]] = calcDist(center, pair[2])
     end

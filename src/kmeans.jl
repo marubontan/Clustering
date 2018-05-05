@@ -74,7 +74,12 @@ function kMeans(data::DataFrame, k::Int; initializer=nothing)
         estimatedClass = tempEstimatedClass
         iterCount += 1
     end
-    return KMeansResults(data, k, estimatedClass, centroidsArray, iterCount, costArray)
+    return KMeansResults(data,
+                         k,
+                         estimatedClass,
+                         centroidsArray,
+                         iterCount,
+                         costArray)
 end
 
 
@@ -196,7 +201,10 @@ function wrapperToStochasticallyPickUp(data::Dict, n::Int)
 end
 
 
-function updateDistanceDict(distanceDict, dataDict, ind)
+function updateDistanceDict(distanceDict::Dict{Int, Float64},
+                            dataDict::Dict{Int, Array{Float64, 1}},
+                            ind::Int)
+
     distanceBetweenNewCentroidAndDataPoints = calcDistBetweenCenterAndDataPoints(dataDict, ind)
     for pair in distanceDict
         if pair[2] > distanceBetweenNewCentroidAndDataPoints[pair[1]]
