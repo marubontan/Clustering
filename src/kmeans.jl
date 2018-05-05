@@ -103,7 +103,7 @@ function updateGroupBelonging(data::DataFrame, dataPointsNum::Int, centroids::Ar
         end
 
         push!(distanceBetweenDataPointAndNearestCentroid, minimum(distances))
-        classIndex = returnArgumentMin(distances)
+        classIndex = indmin(distances)
         tempEstimatedClass[dataIndex] = classIndex
 
         # TODO: this cost calculation is bad hack

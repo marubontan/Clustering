@@ -1,7 +1,3 @@
-function returnArgumentMin(targetArray::Array)
-    return sortperm(targetArray)[1]
-end
-
 function judgeConvergence(arrayA, arrayB)
     return arrayA == arrayB
 end

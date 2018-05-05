@@ -72,7 +72,7 @@ function updateMedoids(distanceMatrix, groupInfo, k::Int)
         distanceSum = vec(sum(classDistanceMatrix, 2))
         cost += minimum(distanceSum)
 
-        medoidIndex = classIndex[returnArgumentMin(distanceSum)]
+        medoidIndex = classIndex[indmin(distanceSum)]
         medoidsIndices[class] = medoidIndex
     end
     return medoidsIndices, cost
@@ -83,7 +83,7 @@ function updateGroupBelonging(distanceMatrix, representativeIndices::Array{Int})
 
     updatedGroupInfo = Array{Int}(size(dataRepresentativeDistances)[2])
     for i in 1:size(dataRepresentativeDistances)[2]
-        updatedGroupInfo[i] = returnArgumentMin(dataRepresentativeDistances[:, i])
+        updatedGroupInfo[i] = indmin(dataRepresentativeDistances[:, i])
     end
     return updatedGroupInfo
 end
