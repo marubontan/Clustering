@@ -2,11 +2,16 @@ function judgeConvergence(arrayA::Array, arrayB::Array)
     return arrayA == arrayB
 end
 
+
 function makeValuesProbabilistic(values::Array)
     return values / sum(values)
 end
 
-function stochasticallyPickUp(values::Array, probs::Array{Float64}, n::Int)
+
+function stochasticallyPickUp(values::Array,
+                              probs::Array{Float64},
+                              n::Int)
+
     indexProb = Dict{Int, Float64}()
     for key in 1:length(values)
         indexProb[key] = probs[key]
@@ -36,6 +41,7 @@ function stochasticallyPickUp(values::Array, probs::Array{Float64}, n::Int)
     return pickedValues
 end
 
+
 function dataFrameToDict(data::DataFrame)
 
     indexDataDict = Dict{Int, Array}()
@@ -46,6 +52,7 @@ function dataFrameToDict(data::DataFrame)
     return indexDataDict
 end
 
+
 function calcDistBetweenCenterAndDataPoints(data::Dict, centerIndex::Int)
     center = data[centerIndex]
     distanceDict = Dict()
@@ -54,6 +61,7 @@ function calcDistBetweenCenterAndDataPoints(data::Dict, centerIndex::Int)
     end
     return distanceDict
 end
+
 
 function makeDictValueProbabilistic(data::Dict)
     vals = [v for v in values(data)]
@@ -66,6 +74,7 @@ function makeDictValueProbabilistic(data::Dict)
     return data
 end
 
+
 function dataFrame2JaggedArray(data::DataFrame)
     returnArray = Array{Array}(nrow(data))
     for i in 1:nrow(data)
@@ -73,6 +82,7 @@ function dataFrame2JaggedArray(data::DataFrame)
     end
     return returnArray
 end
+
 
 """
     calcDist(sourcePoint, destPoint; method="euclidean")
@@ -90,7 +100,9 @@ julia> calcDist([1,2,3], [2,3,4]; method="minkowski")
 3
 ```
 """
-function calcDist(sourcePoint::Array, destPoint::Array; method="euclidean")
+function calcDist(sourcePoint::Array,
+                  destPoint::Array;
+                  method="euclidean")
 
     if method == "euclidean"
         return euclidean(sourcePoint, destPoint)
@@ -98,3 +110,4 @@ function calcDist(sourcePoint::Array, destPoint::Array; method="euclidean")
         return minkowski(sourcePoint, destPoint)
     end
 end
+

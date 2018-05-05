@@ -10,6 +10,7 @@ struct kMedoidsResults
     costArray::Array{Float64}
 end
 
+
 """
     kMedoids(distanceMatrix, k)
 
@@ -54,13 +55,20 @@ function kMedoids(distanceMatrix, k::Int)
         medoidsIndices = updatedMedoids
         iterCount += 1
     end
-    return kMedoidsResults(distanceMatrix, k, updatedGroupInfo, medoids, iterCount, costArray)
+    return kMedoidsResults(distanceMatrix,
+                           k,
+                           updatedGroupInfo,
+                           medoids,
+                           iterCount,
+                           costArray)
 end
+
 
 function randomlyAssignMedoids(distanceMatrix, k::Int)
     dataPointsNum = size(distanceMatrix)[1]
     return shuffle(1:dataPointsNum)[1:k]
 end
+
 
 function updateMedoids(distanceMatrix, groupInfo, k::Int)
     medoidsIndices = Array{Int}(k)
@@ -78,6 +86,7 @@ function updateMedoids(distanceMatrix, groupInfo, k::Int)
     return medoidsIndices, cost
 end
 
+
 function updateGroupBelonging(distanceMatrix, representativeIndices::Array{Int})
     dataRepresentativeDistances = referenceDistanceMatrix(distanceMatrix, representativeIndices)
 
@@ -88,6 +97,8 @@ function updateGroupBelonging(distanceMatrix, representativeIndices::Array{Int})
     return updatedGroupInfo
 end
 
+
 function referenceDistanceMatrix(distanceMatrix, representativeIndices::Array{Int})
     return distanceMatrix[representativeIndices, :]
 end
+
