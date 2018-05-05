@@ -128,40 +128,6 @@ function findEmptyCluster(label, centers)
     return emptyCluster
 end
 
-function makeValuesProbabilistic(values)
-    return values / sum(values)
-end
-
-function stochasticallyPickUp(values, probs, n)
-    indexProb = Dict()
-    for key in 1:length(values)
-        indexProb[key] = probs[key]
-    end
-
-    pickedValues = []
-    for _ in 1:n
-        border = rand(1)[1]
-
-        sum = 0
-        for pair in indexProb
-            sum += pair[2]
-            if sum > border
-                push!(pickedValues, pair[1])
-
-                # TODO: it's bad hack to delte the loop target in the loop
-                delete!(indexProb, pair[1])
-
-                denominator = 1 - pair[2]
-                for (key,val) in indexProb
-                    indexProb[key] = val / denominator
-                end
-                break
-            end
-        end
-    end
-    return pickedValues
-end
-
 function kMeansPlusPlus(data::DataFrame, k::Int)
     dataDict = dataFrameToDict(data)
     ind = randomlyChooseOneDataPoint(dataDict)
@@ -192,36 +158,6 @@ function randomlyChooseOneDataPoint(data::Dict)
     return randomIndex
 end
 
-function dataFrameToDict(data::DataFrame)
-
-    indexDataDict = Dict()
-    for i in 1:nrow(data)
-        indexDataDict[i] = vec(Array(data[i, :]))
-    end
-
-    return indexDataDict
-end
-
-function calcDistBetweenCenterAndDataPoints(data::Dict, centerIndex::Int)
-    center = data[centerIndex]
-    distanceDict = Dict()
-    for pair in data
-        distanceDict[pair[1]] = calcDist(center, pair[2])
-    end
-    return distanceDict
-end
-
-function makeDictValueProbabilistic(data)
-    vals = [v for v in values(data)]
-    valsSum = sum(vals)
-
-    for pair in data
-        data[pair[1]] = pair[2] / valsSum
-    end
-
-    return data
-end
-
 function wrapperToStochasticallyPickUp(data::Dict, n::Int)
     index = []
     probs = []
@@ -231,14 +167,6 @@ function wrapperToStochasticallyPickUp(data::Dict, n::Int)
     end
 
     return stochasticallyPickUp(index, probs, n)
-end
-
-function dataFrame2JaggedArray(data::DataFrame)
-    returnArray = []
-    for i in 1:nrow(data)
-        push!(returnArray, vec(Array(data[i,:])))
-    end
-    return returnArray
 end
 
 function updateDistanceDict(distanceDict, dataDict, ind)

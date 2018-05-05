@@ -23,6 +23,32 @@ include("../src/kmedoids.jl")
     @test_throws ErrorException minkowski(dataSourceLen, dataDestLen)
 end
 
+@testset "utils test" begin
+    arrayOne = [1,2,3,4]
+    @test makeValuesProbabilistic(arrayOne) == [0.1, 0.2, 0.3, 0.4]
+
+    arrayOne = [1,2,3,4]
+    probOne = [0.2, 0.4, 0.1, 0.3]
+    k = 2
+    pickedUp = stochasticallyPickUp(arrayOne, probOne, k)
+    @test length(pickedUp) == k
+    @test typeof(pickedUp[1]) == Int
+
+    xA = [1.0, 2.0, 2.0, 3.0]
+    yA = [3.0, 2.0, 3.0, 8.0]
+    dataA = DataFrame(x=xA, y=yA)
+    dataADict = Dict(1 => [1.0, 3.0], 2 => [2.0, 2.0], 3 => [2.0, 3.0], 4 => [3.0, 8.0])
+    @test dataFrameToDict(dataA) == dataADict
+
+    indA = 2
+    @test_nowarn calcDistBetweenCenterAndDataPoints(dataADict, indA)
+
+    @test makeDictValueProbabilistic(Dict(1 => 1.0, 2 => 4.0)) == Dict(1 => 0.2, 2 => 0.8)
+
+    dataFrameA = DataFrame(x=[1,2,3], y=[3,4,5])
+    @test dataFrame2JaggedArray(dataFrameA) == [[1, 3], [2, 4], [3, 5]]
+end
+
 @testset "K-means test" begin
     function makeData()
         groupOne = rand(MvNormal([10.0, 10.0], 5.0 * eye(2)), 100)
@@ -58,13 +84,6 @@ end
         @test updatedCenterOne[1:2] == centerOne[1:2]
         @test findEmptyCluster(labelOne, centerOne) == [3]
 
-        arrayOne = [1,2,3,4]
-        @test makeValuesProbabilistic(arrayOne) == [0.1, 0.2, 0.3, 0.4]
-        probOne = [0.2, 0.4, 0.1, 0.3]
-        k = 2
-        pickedUp = stochasticallyPickUp(arrayOne, probOne, k)
-        @test length(pickedUp) == k
-        @test typeof(pickedUp[1]) == Int
 
     end
 
@@ -82,13 +101,8 @@ end
         k = 2
         @test_nowarn kMeansPlusPlus(dataA, k)
         dataADict = Dict(1 => [1.0, 3.0], 2 => [2.0, 2.0], 3 => [2.0, 3.0], 4 => [3.0, 8.0])
-        @test dataFrameToDict(dataA) == dataADict
         ind = randomlyChooseOneDataPoint(dataADict)
         @test ind in [1, 2, 3, 4]
-
-        indA = 2
-        @test_nowarn calcDistBetweenCenterAndDataPoints(dataADict, indA)
-        @test makeDictValueProbabilistic(Dict(1 => 1.0, 2 => 4.0)) == Dict(1 => 0.2, 2 => 0.8)
 
         dictA = Dict(1 => 0.2, 2 => 0.4, 3 => 0.1, 4 => 0.3)
         n = 2
@@ -97,8 +111,6 @@ end
         @test length(pickedUp) == n
         @test typeof(pickedUp[1]) == Int
 
-        dataFrameA = DataFrame(x=[1,2,3], y=[3,4,5])
-        @test dataFrame2JaggedArray(dataFrameA) == [[1, 3], [2, 4], [3, 5]]
 
         distanceDict = Dict(1 => 10.0, 2 => 20.0, 3 => 30.0)
         dataDict = Dict(1 => [0.0, 0.0], 2 => [1.0, 1.0], 3 => [100.0, 100.0])
@@ -157,8 +169,6 @@ end
         @test isa(updateGroupBelonging(distanceMatrix, [5, 10]), Array{Int})
         @test length(updateGroupBelonging(distanceMatrix, [5, 10])) == size(distanceMatrix)[1]
     end
-
-    @test returnArgumentMin([3, 1, 2]) == 2
 
     results = kMedoids(distanceMatrix, k)
 
