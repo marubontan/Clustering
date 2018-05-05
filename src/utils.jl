@@ -6,8 +6,8 @@ function makeValuesProbabilistic(values::Array)
     return values / sum(values)
 end
 
-function stochasticallyPickUp(values::Array, probs::Array, n::Int)
-    indexProb = Dict()
+function stochasticallyPickUp(values::Array, probs::Array{Float64}, n::Int)
+    indexProb = Dict{Int, Float64}()
     for key in 1:length(values)
         indexProb[key] = probs[key]
     end
@@ -38,7 +38,7 @@ end
 
 function dataFrameToDict(data::DataFrame)
 
-    indexDataDict = Dict()
+    indexDataDict = Dict{Int, Array}()
     for i in 1:nrow(data)
         indexDataDict[i] = vec(Array(data[i, :]))
     end
@@ -67,9 +67,9 @@ function makeDictValueProbabilistic(data::Dict)
 end
 
 function dataFrame2JaggedArray(data::DataFrame)
-    returnArray = []
+    returnArray = Array{Array}(nrow(data))
     for i in 1:nrow(data)
-        push!(returnArray, vec(Array(data[i,:])))
+        returnArray[i] = vec(Array(data[i,:]))
     end
     return returnArray
 end

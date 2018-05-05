@@ -160,7 +160,7 @@ end
 
 function wrapperToStochasticallyPickUp(data::Dict, n::Int)
     index = []
-    probs = []
+    probs = Float64[]
     for pair in data
         push!(index, pair[1])
         push!(probs, pair[2])
