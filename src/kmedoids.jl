@@ -65,14 +65,18 @@ end
 
 
 function randomlyAssignMedoids(distanceMatrix, k::Int)
+
     dataPointsNum = size(distanceMatrix)[1]
     return shuffle(1:dataPointsNum)[1:k]
 end
 
 
-function updateMedoids(distanceMatrix, groupInfo, k::Int)
+function updateMedoids(distanceMatrix,
+                       groupInfo::Array{Int},
+                       k::Int)
+
     medoidsIndices = Array{Int}(k)
-    cost = 0
+    cost = 0.0
     for class in 1:k
         classIndex = find(groupInfo .== class)
         classDistanceMatrix = distanceMatrix[classIndex, classIndex]
@@ -88,7 +92,9 @@ end
 
 
 function updateGroupBelonging(distanceMatrix, representativeIndices::Array{Int})
-    dataRepresentativeDistances = referenceDistanceMatrix(distanceMatrix, representativeIndices)
+
+    dataRepresentativeDistances = referenceDistanceMatrix(distanceMatrix,
+                                                          representativeIndices)
 
     updatedGroupInfo = Array{Int}(size(dataRepresentativeDistances)[2])
     for i in 1:size(dataRepresentativeDistances)[2]
