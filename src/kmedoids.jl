@@ -10,6 +10,7 @@ struct kMedoidsResults
     costArray::Array{Float64}
 end
 
+
 """
     kMedoids(distanceMatrix, k)
 
@@ -54,17 +55,28 @@ function kMedoids(distanceMatrix, k::Int)
         medoidsIndices = updatedMedoids
         iterCount += 1
     end
-    return kMedoidsResults(distanceMatrix, k, updatedGroupInfo, medoids, iterCount, costArray)
+    return kMedoidsResults(distanceMatrix,
+                           k,
+                           updatedGroupInfo,
+                           medoids,
+                           iterCount,
+                           costArray)
 end
 
+
 function randomlyAssignMedoids(distanceMatrix, k::Int)
+
     dataPointsNum = size(distanceMatrix)[1]
     return shuffle(1:dataPointsNum)[1:k]
 end
 
-function updateMedoids(distanceMatrix, groupInfo, k::Int)
+
+function updateMedoids(distanceMatrix,
+                       groupInfo::Array{Int},
+                       k::Int)
+
     medoidsIndices = Array{Int}(k)
-    cost = 0
+    cost = 0.0
     for class in 1:k
         classIndex = find(groupInfo .== class)
         classDistanceMatrix = distanceMatrix[classIndex, classIndex]
@@ -72,22 +84,27 @@ function updateMedoids(distanceMatrix, groupInfo, k::Int)
         distanceSum = vec(sum(classDistanceMatrix, 2))
         cost += minimum(distanceSum)
 
-        medoidIndex = classIndex[returnArgumentMin(distanceSum)]
+        medoidIndex = classIndex[indmin(distanceSum)]
         medoidsIndices[class] = medoidIndex
     end
     return medoidsIndices, cost
 end
 
+
 function updateGroupBelonging(distanceMatrix, representativeIndices::Array{Int})
-    dataRepresentativeDistances = referenceDistanceMatrix(distanceMatrix, representativeIndices)
+
+    dataRepresentativeDistances = referenceDistanceMatrix(distanceMatrix,
+                                                          representativeIndices)
 
     updatedGroupInfo = Array{Int}(size(dataRepresentativeDistances)[2])
     for i in 1:size(dataRepresentativeDistances)[2]
-        updatedGroupInfo[i] = returnArgumentMin(dataRepresentativeDistances[:, i])
+        updatedGroupInfo[i] = indmin(dataRepresentativeDistances[:, i])
     end
     return updatedGroupInfo
 end
 
+
 function referenceDistanceMatrix(distanceMatrix, representativeIndices::Array{Int})
     return distanceMatrix[representativeIndices, :]
 end
+

@@ -24,6 +24,7 @@ function euclidean(sourcePoint::Array, destPoint::Array)
     return dist
 end
 
+
 """
     minkowski(sourcePoint, destPoint)
 
@@ -48,3 +49,4 @@ function minkowski(sourcePoint::Array, destPoint::Array)
     end
     return sum
 end
+
