@@ -8,40 +8,6 @@ function makeValuesProbabilistic(values::Array)
 end
 
 
-function stochasticallyPickUp(values::Array,
-                              probs::Array{Float64},
-                              n::Int)
-
-    indexProb = Dict{Int, Float64}()
-    for key in 1:length(values)
-        indexProb[key] = probs[key]
-    end
-
-    pickedValues = []
-    for _ in 1:n
-        border = rand(1)[1]
-
-        sum = 0
-        for pair in indexProb
-            sum += pair[2]
-            if sum > border
-                push!(pickedValues, pair[1])
-
-                # TODO: it's bad hack to delte the loop target in the loop
-                delete!(indexProb, pair[1])
-
-                denominator = 1 - pair[2]
-                for (key,val) in indexProb
-                    indexProb[key] = val / denominator
-                end
-                break
-            end
-        end
-    end
-    return pickedValues
-end
-
-
 function dataFrameToDict(data::DataFrame)
 
     indexDataDict = Dict{Int, Array{Float64, 1}}()
