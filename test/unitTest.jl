@@ -27,13 +27,6 @@ end
     arrayOne = [1,2,3,4]
     @test makeValuesProbabilistic(arrayOne) == [0.1, 0.2, 0.3, 0.4]
 
-    arrayOne = [1,2,3,4]
-    probOne = [0.2, 0.4, 0.1, 0.3]
-    k = 2
-    pickedUp = stochasticallyPickUp(arrayOne, probOne, k)
-    @test length(pickedUp) == k
-    @test typeof(pickedUp[1]) == Int
-
     xA = [1.0, 2.0, 2.0, 3.0]
     yA = [3.0, 2.0, 3.0, 8.0]
     dataA = DataFrame(x=xA, y=yA)
@@ -106,11 +99,6 @@ end
 
         dictA = Dict(1 => 0.2, 2 => 0.4, 3 => 0.1, 4 => 0.3)
         n = 2
-        @test_nowarn wrapperToStochasticallyPickUp(dictA, n)
-        pickedUp = wrapperToStochasticallyPickUp(dictA, n)
-        @test length(pickedUp) == n
-        @test typeof(pickedUp[1]) == Int
-
 
         distanceDict = Dict(1 => 10.0, 2 => 20.0, 3 => 30.0)
         dataDict = Dict(1 => [0.0, 0.0], 2 => [1.0, 1.0], 3 => [100.0, 100.0])

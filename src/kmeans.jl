@@ -143,9 +143,10 @@ function assignDataOnEmptyCluster(data::DataFrame,
 
     emptyCluster = findEmptyCluster(label, centers)
     nearestDistProb = makeValuesProbabilistic(nearestDist)
-    pickedDataPointsIndex = stochasticallyPickUp(Array(1:nrow(data)),
-                                                 nearestDistProb,
-                                                 length(emptyCluster))
+    pickedDataPointsIndex = sample(Array(1:nrow(data)),
+                                   Weights(nearestDistProb),
+                                   length(emptyCluster);
+                                   replace=false)
 
     for (i,cluster) in enumerate(emptyCluster)
         centers[cluster] = vec(Array(data[pickedDataPointsIndex[i], :]))
@@ -207,7 +208,7 @@ function wrapperToStochasticallyPickUp(data::Dict{Int, Float64},
         probs[i] = pair[2]
     end
 
-    return stochasticallyPickUp(index, probs, n)
+    return sample(index, Weights(probs), n; replace=false)
 end
 
 
