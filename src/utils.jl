@@ -1,3 +1,6 @@
+using DataFrames
+include("./dist.jl")
+
 function judgeConvergence(arrayA::Array, arrayB::Array)
     return arrayA == arrayB
 end
@@ -76,4 +79,3 @@ function calcDist(sourcePoint::Array,
         return minkowski(sourcePoint, destPoint)
     end
 end
-
