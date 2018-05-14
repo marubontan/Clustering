@@ -160,7 +160,7 @@ end
 
     results = kMedoids(distanceMatrix, k)
 
-    @test isa(results, kMedoidsResults)
+    @test isa(results, KMedoidsResults)
     @test size(results.x) == size(distanceMatrix)
     @test results.k == k
     @test length(results.estimatedClass) ==  size(data)[2]

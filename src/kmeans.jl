@@ -224,4 +224,3 @@ function updateDistanceDict(distanceDict::Dict{Int, Float64},
     end
     return distanceDict
 end
-

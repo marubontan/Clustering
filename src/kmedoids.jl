@@ -1,8 +1,8 @@
 using DataFrames
 include("utils.jl")
 
-struct kMedoidsResults
-    x
+struct KMedoidsResults
+    x::Array{Float64, 2}
     k::Int
     estimatedClass::Array{Int}
     medoids::Array{Array}
@@ -55,7 +55,7 @@ function kMedoids(distanceMatrix, k::Int)
         medoidsIndices = updatedMedoids
         iterCount += 1
     end
-    return kMedoidsResults(distanceMatrix,
+    return KMedoidsResults(distanceMatrix,
                            k,
                            updatedGroupInfo,
                            medoids,
@@ -107,4 +107,3 @@ end
 function referenceDistanceMatrix(distanceMatrix, representativeIndices::Array{Int})
     return distanceMatrix[representativeIndices, :]
 end
-
