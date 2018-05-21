@@ -3,6 +3,7 @@ using Distributions
 using DataFrames
 import Distances
 include("../src/dist.jl")
+include("../src/predict.jl")
 include("../src/kmeans.jl")
 include("../src/kmedoids.jl")
 
@@ -166,4 +167,21 @@ end
     @test length(results.estimatedClass) ==  size(data)[2]
     @test length(results.medoids) == results.iterCount
     @test length(results.costArray) == results.iterCount
+end
+
+@testset "predict" begin
+    function makeData()
+        groupOne = rand(MvNormal([10.0, 10.0], 5.0 * eye(2)), 100)
+        groupTwo = rand(MvNormal([0.0, 0.0], 10 * eye(2)), 100)
+        return hcat(groupOne, groupTwo)'
+    end
+
+    data = makeData()
+    k = 2
+    resultsA = kMeans(DataFrame(data), k)
+
+    target = DataFrame([11.0 11.0; 1.0 1.0])
+
+    predicted = predict(resultsA, target)
+    @test isa(predicted, Array)
 end

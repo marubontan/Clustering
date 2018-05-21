@@ -1,10 +1,11 @@
 using DataFrames
 using StatsBase
+include("type.jl")
 include("dist.jl")
 include("utils.jl")
 
 
-struct KMeansResults
+struct KMeansResults <: ClusteringResult
     x::DataFrames.DataFrame
     k::Int
     estimatedClass::Array{Int}
