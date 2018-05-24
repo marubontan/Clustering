@@ -1,8 +1,7 @@
 using DataFrames
-include("type.jl")
 include("utils.jl")
 
-struct KMedoidsResults <: ClusteringResult
+struct KMedoidsResults
     x::Array{Float64, 2}
     k::Int
     estimatedClass::Array{Int}

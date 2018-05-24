@@ -1,6 +1,8 @@
 using DataFrames
 include("type.jl")
 
+
 function predict(result::ClusteringResult, target::DataFrame)
-    return [1, 2]
+    predictedValues = _predict(result, target)
+    return predictedValues
 end

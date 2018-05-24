@@ -1,6 +1,7 @@
 using DataFrames
 using StatsBase
 include("type.jl")
+include("predict.jl")
 include("dist.jl")
 include("utils.jl")
 
@@ -224,4 +225,22 @@ function updateDistanceDict(distanceDict::Dict{Int, Float64},
         end
     end
     return distanceDict
+end
+
+function _predict(result::KMeansResults, target::DataFrame)
+    centroids = result.centroids[end]
+
+    row,col = size(target)
+
+    predicted = Array{Int}(row)
+    for dataPointIndex in 1:row
+
+        distance = Array{Float64}(col)
+        for (cluster,centroid) in enumerate(centroids)
+            distance[cluster] = calcDist(Array(target[dataPointIndex, :]), centroid)
+        end
+
+        predicted[dataPointIndex] = indmin(distance)
+    end
+    return predicted
 end
