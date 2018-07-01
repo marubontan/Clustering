@@ -134,8 +134,8 @@ end
     @test size(resultsC.x) == size(data)
     @test resultsC.k == k
     @test length(resultsC.estimatedClass) ==  size(data)[1]
-    @test length(resultsC.centroids) == resultsB.iterCount
-    @test length(resultsC.costArray) == resultsB.iterCount
+    @test length(resultsC.centroids) == resultsC.iterCount
+    @test length(resultsC.costArray) == resultsC.iterCount
     @test length(Set(resultsC.estimatedClass)) == k
     @test resultsC.maxIter == 100
 end
