@@ -106,7 +106,7 @@ function updateCentroids(data::DataFrame,
         groupIndex = find(estimatedClass .== centroidIndex)
         groupData = data[groupIndex, :]
 
-        centroid = [ valArray[1] for valArray in colwise(mean, groupData) ]
+        centroid = [ valArray[1] for valArray in DataFrames.colwise(mean, groupData) ]
         centroids[centroidIndex] = centroid
     end
     return centroids
@@ -237,7 +237,7 @@ function _predict(result::KMeansResults, target::DataFrame)
     predicted = Array{Int}(row)
     for dataPointIndex in 1:row
 
-        distance = Array{Float64}(col)
+        distance = Array{Float64}(length(centroids))
         for (cluster,centroid) in enumerate(centroids)
             distance[cluster] = calcDist(Array(target[dataPointIndex, :]), centroid)
         end
