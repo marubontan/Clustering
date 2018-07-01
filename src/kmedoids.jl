@@ -8,6 +8,7 @@ struct KMedoidsResults
     medoids::Array{Array}
     iterCount::Int
     costArray::Array{Float64}
+    maxIter::Int
 end
 
 
@@ -34,7 +35,7 @@ julia> kMedoids(distanceMatrix, 2)
 kMedoidsResults([0 2 8; 2 0 2; 8 2 0], 2, [2, 1, 1], Array[[2, 1]], 1)
 ```
 """
-function kMedoids(distanceMatrix, k::Int)
+function kMedoids(distanceMatrix, k::Int; maxIter=10000)
     # initialize
     medoidsIndices = randomlyAssignMedoids(distanceMatrix, k)
 
@@ -42,7 +43,7 @@ function kMedoids(distanceMatrix, k::Int)
     updatedGroupInfo = []
     medoids = []
     costArray = Float64[]
-    while true
+    while iterCount < maxIter 
         updatedGroupInfo = updateGroupBelonging(distanceMatrix, medoidsIndices)
         updatedMedoids, cost = updateMedoids(distanceMatrix, updatedGroupInfo, k)
         push!(medoids, updatedMedoids)
@@ -60,7 +61,8 @@ function kMedoids(distanceMatrix, k::Int)
                            updatedGroupInfo,
                            medoids,
                            iterCount,
-                           costArray)
+                           costArray,
+                           maxIter)
 end
 
 

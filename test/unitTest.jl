@@ -127,6 +127,17 @@ end
     @test length(resultsB.centroids) == resultsB.iterCount
     @test length(resultsB.costArray) == resultsB.iterCount
     @test length(Set(resultsB.estimatedClass)) == k
+
+    resultsC = kMeans(DataFrame(data), k; initializer="kmeans++", maxIter=100)
+
+    @test isa(resultsC, KMeansResults)
+    @test size(resultsC.x) == size(data)
+    @test resultsC.k == k
+    @test length(resultsC.estimatedClass) ==  size(data)[1]
+    @test length(resultsC.centroids) == resultsC.iterCount
+    @test length(resultsC.costArray) == resultsC.iterCount
+    @test length(Set(resultsC.estimatedClass)) == k
+    @test resultsC.maxIter == 100
 end
 
 @testset "K-medoids test" begin
@@ -159,14 +170,24 @@ end
         @test length(updateGroupBelonging(distanceMatrix, [5, 10])) == size(distanceMatrix)[1]
     end
 
-    results = kMedoids(distanceMatrix, k)
+    resultsA = kMedoids(distanceMatrix, k)
 
-    @test isa(results, KMedoidsResults)
-    @test size(results.x) == size(distanceMatrix)
-    @test results.k == k
-    @test length(results.estimatedClass) ==  size(data)[2]
-    @test length(results.medoids) == results.iterCount
-    @test length(results.costArray) == results.iterCount
+    @test isa(resultsA, KMedoidsResults)
+    @test size(resultsA.x) == size(distanceMatrix)
+    @test resultsA.k == k
+    @test length(resultsA.estimatedClass) ==  size(data)[2]
+    @test length(resultsA.medoids) == resultsA.iterCount
+    @test length(resultsA.costArray) == resultsA.iterCount
+
+    resultsB = kMedoids(distanceMatrix, k; maxIter=100)
+
+    @test isa(resultsB, KMedoidsResults)
+    @test size(resultsB.x) == size(distanceMatrix)
+    @test resultsB.k == k
+    @test length(resultsB.estimatedClass) ==  size(data)[2]
+    @test length(resultsB.medoids) == resultsB.iterCount
+    @test length(resultsB.costArray) == resultsB.iterCount
+    @test resultsB.maxIter == 100
 end
 
 @testset "predict" begin

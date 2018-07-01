@@ -13,6 +13,7 @@ struct KMeansResults <: ClusteringResult
     centroids::Array{Array}
     iterCount::Int
     costArray::Array{Float64}
+    maxIter::Int
 end
 
 
@@ -36,7 +37,7 @@ KMeansResults(3×2 DataFrames.DataFrame
 │ 3   │ 3 │ 6 │, 2, [1, 1, 1], 1, [4.0])
 ```
 """
-function kMeans(data::DataFrame, k::Int; initializer=nothing)
+function kMeans(data::DataFrame, k::Int; initializer=nothing, maxIter=10000)
 
     # initialize
     dataPointsNum = size(data, 1)
@@ -50,7 +51,7 @@ function kMeans(data::DataFrame, k::Int; initializer=nothing)
     iterCount = 0
     centroidsArray = []
     costArray = Float64[]
-    while true
+    while iterCount < maxIter
 
         # update
         tempEstimatedClass, cost, nearestDist = updateGroupBelonging(data,
@@ -84,7 +85,8 @@ function kMeans(data::DataFrame, k::Int; initializer=nothing)
                          estimatedClass,
                          centroidsArray,
                          iterCount,
-                         costArray)
+                         costArray,
+                         maxIter)
 end
 
 
