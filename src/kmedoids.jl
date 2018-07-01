@@ -5,7 +5,7 @@ struct KMedoidsResults
     x::Array{Float64, 2}
     k::Int
     estimatedClass::Array{Int}
-    medoids::Array{Array}
+    medoids::Array{Array{Int}}
     iterCount::Int
     costArray::Array{Float64}
     maxIter::Int
@@ -36,18 +36,19 @@ kMedoidsResults([0 2 8; 2 0 2; 8 2 0], 2, [2, 1, 1], Array[[2, 1]], 1)
 ```
 """
 function kMedoids(distanceMatrix, k::Int; maxIter=10000)
+
     # initialize
     medoidsIndices = randomlyAssignMedoids(distanceMatrix, k)
 
     iterCount = 0
     updatedGroupInfo = []
-    medoids = []
-    costArray = Float64[]
-    while iterCount < maxIter 
+    medoids = Array{Array{Int}}(maxIter)
+    costArray = Array{Float64}(maxIter)
+    while iterCount < maxIter
         updatedGroupInfo = updateGroupBelonging(distanceMatrix, medoidsIndices)
         updatedMedoids, cost = updateMedoids(distanceMatrix, updatedGroupInfo, k)
-        push!(medoids, updatedMedoids)
-        push!(costArray, cost)
+        medoids[iterCount+1] = updatedMedoids
+        costArray[iterCount+1] = cost
 
         if judgeConvergence(medoidsIndices, updatedMedoids)
             iterCount += 1
@@ -59,9 +60,9 @@ function kMedoids(distanceMatrix, k::Int; maxIter=10000)
     return KMedoidsResults(distanceMatrix,
                            k,
                            updatedGroupInfo,
-                           medoids,
+                           medoids[1:iterCount],
                            iterCount,
-                           costArray,
+                           costArray[1:iterCount],
                            maxIter)
 end
 

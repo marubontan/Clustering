@@ -10,7 +10,7 @@ struct KMeansResults <: ClusteringResult
     x::DataFrames.DataFrame
     k::Int
     estimatedClass::Array{Int}
-    centroids::Array{Array}
+    centroids::Array{Array{Array{Float64, 1}, 1}, 1}
     iterCount::Int
     costArray::Array{Float64}
     maxIter::Int
@@ -50,7 +50,8 @@ function kMeans(data::DataFrame, k::Int; initializer=nothing, maxIter=10000)
 
     iterCount = 0
     centroidsArray = []
-    costArray = Float64[]
+    centroidsArray = Array{Array{Array{Float64, 1}, 1}, 1}(maxIter)
+    costArray = Array{Float64}(maxIter)
     while iterCount < maxIter
 
         # update
@@ -59,7 +60,7 @@ function kMeans(data::DataFrame, k::Int; initializer=nothing, maxIter=10000)
                                                                      centroids,
                                                                      k)
 
-        push!(costArray, cost)
+        costArray[iterCount+1] = cost
 
         centroids = updateCentroids(data, tempEstimatedClass, k)
 
@@ -70,7 +71,7 @@ function kMeans(data::DataFrame, k::Int; initializer=nothing, maxIter=10000)
                                                  nearestDist)
         end
 
-        push!(centroidsArray, centroids)
+        centroidsArray[iterCount+1] = centroids
 
         if judgeConvergence(estimatedClass, tempEstimatedClass)
             iterCount += 1
@@ -83,9 +84,9 @@ function kMeans(data::DataFrame, k::Int; initializer=nothing, maxIter=10000)
     return KMeansResults(data,
                          k,
                          estimatedClass,
-                         centroidsArray,
+                         centroidsArray[1:iterCount],
                          iterCount,
-                         costArray,
+                         costArray[1:iterCount],
                          maxIter)
 end
 
