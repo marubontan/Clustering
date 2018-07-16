@@ -17,8 +17,9 @@ function euclidean(sourcePoint::Array, destPoint::Array)
     length(sourcePoint) == length(destPoint) || error("The lengths of source and destination points should be same.")
 
     sum = 0
-    for i in 1:length(sourcePoint)
-        sum += (destPoint[i] - sourcePoint[i]) ^ 2
+    @simd for i in 1:length(sourcePoint)
+        #@inbounds sum += (destPoint[i] - sourcePoint[i]) ^ 2
+        @inbounds sum += abs2(destPoint[i] - sourcePoint[i])
     end
     dist = sqrt(sum)
     return dist
@@ -44,9 +45,8 @@ function minkowski(sourcePoint::Array, destPoint::Array)
     length(sourcePoint) == length(destPoint) || error("The lengths of source and destination points should be same.")
 
     sum = 0
-    for i in 1:length(sourcePoint)
-        sum += abs(destPoint[i] - sourcePoint[i])
+    @simd for i in 1:length(sourcePoint)
+        @inbounds sum += abs(destPoint[i] - sourcePoint[i])
     end
     return sum
 end
-
