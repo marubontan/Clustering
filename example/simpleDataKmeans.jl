@@ -3,8 +3,12 @@ using Distributions
 include("../src/kmeans.jl")
 
 function makeData()
-    groupOne = rand(MvNormal([10.0, 10.0], 5.0 * eye(2)), 100)
-    groupTwo = rand(MvNormal([0.0, 0.0], 10 * eye(2)), 100)
+    eye = zeros(2, 2)
+    for i = 1:2
+        eye[i, i] = 1.0
+    end
+    groupOne = rand(MvNormal([10.0, 10.0], 5.0 * eye), 100)
+    groupTwo = rand(MvNormal([0.0, 0.0], 10 * eye), 100)
     return hcat(groupOne, groupTwo)'
 end
 

@@ -1,4 +1,5 @@
 using DataFrames
+using Random
 include("utils.jl")
 
 struct KMedoidsResults
@@ -42,8 +43,8 @@ function kMedoids(distanceMatrix, k::Int; maxIter=10000)
 
     iterCount = 0
     updatedGroupInfo = []
-    medoids = Array{Array{Int}}(maxIter)
-    costArray = Array{Float64}(maxIter)
+    medoids = Array{Array{Int}}(undef, maxIter)
+    costArray = Array{Float64}(undef, maxIter)
     while iterCount < maxIter
         updatedGroupInfo = updateGroupBelonging(distanceMatrix, medoidsIndices)
         updatedMedoids, cost = updateMedoids(distanceMatrix, updatedGroupInfo, k)
@@ -70,7 +71,7 @@ end
 function randomlyAssignMedoids(distanceMatrix, k::Int)
 
     dataPointsNum = size(distanceMatrix)[1]
-    return shuffle(1:dataPointsNum)[1:k]
+    return Random.shuffle(1:dataPointsNum)[1:k]
 end
 
 
@@ -78,16 +79,16 @@ function updateMedoids(distanceMatrix,
                        groupInfo::Array{Int},
                        k::Int)
 
-    medoidsIndices = Array{Int}(k)
+    medoidsIndices = Array{Int}(undef, k)
     cost = 0.0
     for class in 1:k
-        classIndex = find(groupInfo .== class)
+        classIndex = findall(groupInfo .== class)
         classDistanceMatrix = distanceMatrix[classIndex, classIndex]
 
-        distanceSum = vec(sum(classDistanceMatrix, 2))
+        distanceSum = vec(sum(classDistanceMatrix, dims=2))
         cost += minimum(distanceSum)
 
-        medoidIndex = classIndex[indmin(distanceSum)]
+        medoidIndex = classIndex[argmin(distanceSum)]
         medoidsIndices[class] = medoidIndex
     end
     return medoidsIndices, cost
@@ -99,9 +100,9 @@ function updateGroupBelonging(distanceMatrix, representativeIndices::Array{Int})
     dataRepresentativeDistances = referenceDistanceMatrix(distanceMatrix,
                                                           representativeIndices)
 
-    updatedGroupInfo = Array{Int}(size(dataRepresentativeDistances)[2])
+    updatedGroupInfo = Array{Int}(undef, size(dataRepresentativeDistances)[2])
     for i in 1:size(dataRepresentativeDistances)[2]
-        updatedGroupInfo[i] = indmin(dataRepresentativeDistances[:, i])
+        updatedGroupInfo[i] = argmin(dataRepresentativeDistances[:, i])
     end
     return updatedGroupInfo
 end

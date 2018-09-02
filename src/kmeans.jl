@@ -1,5 +1,6 @@
 using DataFrames
 using StatsBase
+using Statistics
 include("type.jl")
 include("predict.jl")
 include("dist.jl")
@@ -50,8 +51,8 @@ function kMeans(data::DataFrame, k::Int; initializer=nothing, maxIter=10000)
 
     iterCount = 0
     centroidsArray = []
-    centroidsArray = Array{Array{Array{Float64, 1}, 1}, 1}(maxIter)
-    costArray = Array{Float64}(maxIter)
+    centroidsArray = Array{Array{Array{Float64, 1}, 1}, 1}(undef, maxIter)
+    costArray = Array{Float64}(undef, maxIter)
     while iterCount < maxIter
 
         # update
@@ -92,7 +93,7 @@ end
 
 
 function assignRandomKClass(dataPointsNum::Int, k::Int)
-    estimatedClass = Array{Int}(dataPointsNum)
+    estimatedClass = Array{Int}(undef, dataPointsNum)
     sample!(1:k, estimatedClass)
     return estimatedClass
 end
@@ -102,12 +103,12 @@ function updateCentroids(data::DataFrame,
                          estimatedClass::Array{Int},
                          k::Int)
 
-    centroids = Array{Array{Float64,1}}(k)
+    centroids = Array{Array{Float64,1}}(undef, k)
     for centroidIndex in 1:k
-        groupIndex = find(estimatedClass .== centroidIndex)
+        groupIndex = findall(estimatedClass .== centroidIndex)
         groupData = data[groupIndex, :]
 
-        centroid = [ valArray[1] for valArray in DataFrames.colwise(mean, groupData) ]
+        centroid = [ valArray[1] for valArray in DataFrames.colwise(Statistics.mean, groupData) ]
         centroids[centroidIndex] = centroid
     end
     return centroids
@@ -119,19 +120,19 @@ function updateGroupBelonging(data::DataFrame,
                               centroids::Array,
                               k::Int)
 
-    tempEstimatedClass = Array{Int}(dataPointsNum)
+    tempEstimatedClass = Array{Int}(undef, dataPointsNum)
 
     cost = 0.0
-    distanceBetweenDataPointAndNearestCentroid = Array{Float64}(dataPointsNum)
+    distanceBetweenDataPointAndNearestCentroid = Array{Float64}(undef, dataPointsNum)
     for dataIndex in 1:dataPointsNum
-        dataPoint = Array(data[dataIndex, :])
-        distances = Array{Float64}(k)
+        dataPoint = convert(Array, data[dataIndex, :])
+        distances = Array{Float64}(undef, k)
         for centroidIndex in 1:k
             distances[centroidIndex] = calcDist(dataPoint, centroids[centroidIndex])
         end
 
         distanceBetweenDataPointAndNearestCentroid[dataIndex] = minimum(distances)
-        classIndex = indmin(distances)
+        classIndex = argmin(distances)
         tempEstimatedClass[dataIndex] = classIndex
 
         # TODO: this cost calculation is bad hack
@@ -154,7 +155,7 @@ function assignDataOnEmptyCluster(data::DataFrame,
                                    replace=false)
 
     for (i,cluster) in enumerate(emptyCluster)
-        centers[cluster] = vec(Array(data[pickedDataPointsIndex[i], :]))
+        centers[cluster] = vec(convert(Array, data[pickedDataPointsIndex[i], :]))
     end
     return centers
 end
@@ -175,7 +176,7 @@ function kMeansPlusPlus(data::DataFrame, k::Int)
 
     distanceProbDict = makeDictValueProbabilistic(distanceDict)
 
-    centroidsIndices = Array{Int}(k)
+    centroidsIndices = Array{Int}(undef, k)
     centroidsIndices[1] = ind
     for i in 2:k
         centroidsIndex = wrapperToStochasticallyPickUp(distanceProbDict, 1)[1]
@@ -206,8 +207,8 @@ function wrapperToStochasticallyPickUp(data::Dict{Int, Float64},
 
     len = length(keys(data))
 
-    index = Array{Int}(len)
-    probs = Array{Float64}(len)
+    index = Array{Int}(undef, len)
+    probs = Array{Float64}(undef, len)
     for (i, pair) in enumerate(data)
         index[i] = pair[1]
         probs[i] = pair[2]
@@ -235,15 +236,15 @@ function _predict(result::KMeansResults, target::DataFrame)
 
     row,col = size(target)
 
-    predicted = Array{Int}(row)
+    predicted = Array{Int}(undef, row)
     for dataPointIndex in 1:row
 
-        distance = Array{Float64}(length(centroids))
+        distance = Array{Float64}(undef, length(centroids))
         for (cluster,centroid) in enumerate(centroids)
-            distance[cluster] = calcDist(Array(target[dataPointIndex, :]), centroid)
+            distance[cluster] = calcDist(convert(Array, target[dataPointIndex, :]), centroid)
         end
 
-        predicted[dataPointIndex] = indmin(distance)
+        predicted[dataPointIndex] = argmin(distance)
     end
     return predicted
 end
