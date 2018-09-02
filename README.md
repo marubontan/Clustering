@@ -16,7 +16,7 @@ This is the simple example of kMeans clustering.
 ```julia
 using DataFrames
 using Distributions
-using KMeans
+using Clustering
 
 function makeData()
    eye = zeros(2, 2)
