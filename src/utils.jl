@@ -15,7 +15,7 @@ function dataFrameToDict(data::DataFrame)
 
     indexDataDict = Dict{Int, Array{Float64, 1}}()
     for i in 1:nrow(data)
-        indexDataDict[i] = vec(Array(data[i, :]))
+        indexDataDict[i] = vec(convert(Array, data[i, :]))
     end
 
     return indexDataDict
@@ -45,9 +45,9 @@ end
 
 
 function dataFrame2JaggedArray(data::DataFrame)
-    returnArray = Array{Array}(nrow(data))
+    returnArray = Array{Array}(undef, nrow(data))
     for i in 1:nrow(data)
-        returnArray[i] = vec(Array(data[i,:]))
+        returnArray[i] = vec(convert(Array, data[i,:]))
     end
     return returnArray
 end

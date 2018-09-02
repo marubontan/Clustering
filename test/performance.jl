@@ -1,23 +1,28 @@
-using Base.Test
+using Test
 using Distributions
 using DataFrames
 using Distances
 using Combinatorics
 using MLBase
+using Random
 
 include("../src/kmeans.jl")
 include("../src/kmedoids.jl")
 
 
 function makeData()
-    groupOne = rand(MvNormal([10.0, 10.0], 5.0 * eye(2)), 1000)
-    groupTwo = rand(MvNormal([0.0, 0.0], 10 * eye(2)), 1000)
-    groupThree = rand(MvNormal([100.0, 100.0], 20 * eye(2)), 1000)
-    groupFour = rand(MvNormal([100.0, 50.0], 20 * eye(2)), 1000)
+    eye = zeros(2, 2)
+    for i = 1:2
+        eye[i, i] = 1.0
+    end
+    groupOne = rand(MvNormal([10.0, 10.0], 5.0 * eye), 1000)
+    groupTwo = rand(MvNormal([0.0, 0.0], 10 * eye), 1000)
+    groupThree = rand(MvNormal([100.0, 100.0], 20 * eye), 1000)
+    groupFour = rand(MvNormal([100.0, 50.0], 20 * eye), 1000)
     return hcat(groupOne, groupTwo, groupThree, groupFour)'
 end
 
-srand(1234)
+Random.seed!(1234)
 trainData = makeData()
 
 timeKmeans = @elapsed resultKmeans = kMeans(DataFrame(trainData), 4)
@@ -45,7 +50,7 @@ function calculateAccuracy(groundTruth, predicted)
       for pair in zip(sortedGroundTruth, combination)
           conv[pair[1]] = pair[2]
       end
-      target = Array{Int}(length(groundTruth))
+      target = Array{Int}(undef, length(groundTruth))
       for (i,label) in enumerate(groundTruth)
           target[i] = conv[label]
       end
@@ -60,7 +65,7 @@ end
 
 testData = makeData()
 groundTruth = []
-for i in range(1, 4000)
+for i in range(1, length=4000)
     if 1 <= i <=1000
         push!(groundTruth, 1)
     elseif 1001 <= i <= 2000
