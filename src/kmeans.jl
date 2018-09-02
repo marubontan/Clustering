@@ -1,5 +1,6 @@
 using DataFrames
 using StatsBase
+using Statistics
 include("type.jl")
 include("predict.jl")
 include("dist.jl")
@@ -107,7 +108,7 @@ function updateCentroids(data::DataFrame,
         groupIndex = findall(estimatedClass .== centroidIndex)
         groupData = data[groupIndex, :]
 
-        centroid = [ valArray[1] for valArray in DataFrames.colwise(mean, groupData) ]
+        centroid = [ valArray[1] for valArray in DataFrames.colwise(Statistics.mean, groupData) ]
         centroids[centroidIndex] = centroid
     end
     return centroids
